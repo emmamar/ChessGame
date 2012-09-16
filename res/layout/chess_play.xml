@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/playerTurnText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Player One&apos;s Turn" />
+
+    <GridView
+        android:id="@+id/blackPiecesTakenGrid"
+        android:layout_width="match_parent"
+        android:layout_height="40px"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/playerTurnText"
+        android:layout_marginBottom="10px"
+        android:background="#ff8888ff"
+        android:numColumns="8" >
+    </GridView>
+
+    <emma.basic.chessgameus.ChessBoard.BoardDefinitions.ChessBoardView
+        android:id="@+id/chessBoardView"
+        android:layout_width="304px"
+        android:layout_height="304px"
+        android:layout_below="@+id/blackPiecesTakenGrid"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/chess_board"
+        android:clickable="true"
+        tileSize="24" />
+
+    <GridView
+        android:id="@+id/whitePiecesTakenGrid"
+        android:layout_width="match_parent"
+        android:layout_height="40px"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/chessBoardView"
+        android:layout_marginTop="10px"
+        android:background="#ff8888ff"
+        android:numColumns="8" >
+    </GridView>
+
+    <Button
+        android:id="@+id/undoMove"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/whitePiecesTakenGrid"
+        android:layout_marginBottom="62dp"
+        android:text="@string/UndoString" />
+
+    <Button
+        android:id="@+id/restartGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/undoMove"
+        android:layout_alignBottom="@+id/undoMove"
+        android:layout_toRightOf="@+id/undoMove"
+        android:text="@string/restartgamestring" />
+
+    <Button
+        android:id="@+id/resignGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/restartGame"
+        android:layout_alignBottom="@+id/restartGame"
+        android:layout_toRightOf="@+id/restartGame"
+        android:text="@string/resign_game" />
+
+</RelativeLayout>

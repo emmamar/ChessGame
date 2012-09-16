@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, ChessGameActivity!</string>
+    <string name="app_name">ChessGame</string>
+    <string name="play_multi_device">Play Multiplayer on This Device</string>
+    <string name="UndoString">Undo</string>
+    <string name="restartgamestring">Restart Game</string>
+    <string name="play_muli_online">Play Multiplayer Online</string>
+    <string name="create_game">Create New Game</string>
+    <string name="join_current_game">Join Current Game</string>
+    <string name="available_games">Available Games</string>
+    <string name="enter_game_name">Enter Game Name</string>
+    <string name="resign_game">Resign</string>
+    <string name="play_computer">Play Computer</string>
+
+</resources>
