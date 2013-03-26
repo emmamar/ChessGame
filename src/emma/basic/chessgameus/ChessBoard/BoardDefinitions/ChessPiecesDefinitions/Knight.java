@@ -1,12 +1,14 @@
 package emma.basic.chessgameus.ChessBoard.BoardDefinitions.ChessPiecesDefinitions;
 
 import emma.basic.chessgameus.R;
+import emma.basic.chessgameus.ChessBoard.BoardDefinitions.BoardMatrix;
+import emma.basic.chessgameus.ChessBoard.BoardDefinitions.Square;
 
 
 
 public class Knight extends ChessPiece {
-	public Knight(int color, int row, int column) {
-		super(color, row, column);
+	public Knight(int color, Square squ) {
+		super(color, squ);
 	}
 
 	@Override
@@ -18,18 +20,17 @@ public class Knight extends ChessPiece {
 		}
 	}
 
-	public boolean isLegal(ChessPiece[][] board, int startRow, int startColumn,
-			int endRow, int endColumn) {
+	public boolean isLegal(BoardMatrix boardMat, Square startSqu, Square endSqu) {
 		Boolean isLegal = false;
-		if (board[endRow][endColumn] != null
-				&& board[endRow][endColumn].getColor() != this.color
-				|| board[endRow][endColumn] == null) {
-			if (Math.abs(startColumn - endColumn) == 1) {
-				if (Math.abs(startRow - endRow) == 2) {
+		if (boardMat.getPieceAt(endSqu) != null
+				&& boardMat.getPieceAt(endSqu).getColor() != this.color
+				|| boardMat.getPieceAt(endSqu) == null) {
+			if (Math.abs(startSqu.getColumn() - endSqu.getColumn()) == 1) {
+				if (Math.abs(startSqu.getRow() - endSqu.getRow()) == 2) {
 					isLegal = true;
 				}
-			} else if (Math.abs(startRow - endRow) == 1) {
-				if (Math.abs(startColumn - endColumn) == 2) {
+			} else if (Math.abs(startSqu.getRow() - endSqu.getRow()) == 1) {
+				if (Math.abs(startSqu.getColumn() - endSqu.getColumn()) == 2) {
 					isLegal = true;
 				}
 			}

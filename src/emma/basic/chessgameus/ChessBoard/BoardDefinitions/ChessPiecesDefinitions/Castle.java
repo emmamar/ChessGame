@@ -1,12 +1,14 @@
 package emma.basic.chessgameus.ChessBoard.BoardDefinitions.ChessPiecesDefinitions;
 
 import emma.basic.chessgameus.R;
+import emma.basic.chessgameus.ChessBoard.BoardDefinitions.BoardMatrix;
+import emma.basic.chessgameus.ChessBoard.BoardDefinitions.Square;
 
 
 
 public class Castle extends ChessPiece {
-	public Castle(int color, int row, int column) {
-		super(color, row, column);
+	public Castle(int color, Square squ) {
+		super(color, squ);
 	}
 
 	public int getResourceName() {
@@ -18,38 +20,37 @@ public class Castle extends ChessPiece {
 	}
 
 	@Override
-	public boolean isLegal(ChessPiece[][] board, int startRow, int startColumn,
-			int endRow, int endColumn) {
+	public boolean isLegal(BoardMatrix boardMat, Square startSqu, Square endSqu) {
 		Boolean isLegal = false;
-		if (board[endRow][endColumn] != null
-				&& board[endRow][endColumn].getColor() != this.color
-				|| board[endRow][endColumn] == null) {
-			if (startColumn == endColumn) {
+		if (boardMat.getPieceAt(endSqu) != null
+				&& boardMat.getPieceAt(endSqu).getColor() != this.color
+				|| boardMat.getPieceAt(endSqu) == null) {
+			if (startSqu.getColumn() == endSqu.getColumn()) {
 				isLegal = true;
-				if (startRow < endRow) {
-					for (int i = startRow + 1; i < endRow; i++) {
-						if (board[i][startColumn] != null) {
+				if (startSqu.getRow() < endSqu.getRow()) {
+					for (int i = startSqu.getRow() + 1; i < endSqu.getRow(); i++) {
+						if (boardMat.getPieceAt(new Square(false, i, startSqu.getColumn())) != null) {
 							isLegal = false;
 						}
 					}
 				} else {
-					for (int i = startRow - 1; i > endRow; i--) {
-						if (board[i][startColumn] != null) {
+					for (int i = startSqu.getRow() - 1; i > endSqu.getRow(); i--) {
+						if (boardMat.getPieceAt(new Square(false, i, startSqu.getColumn())) != null) {
 							isLegal = false;
 						}
 					}
 				}
-			} else if (startRow == endRow) {
+			} else if (startSqu.getRow() == endSqu.getRow()) {
 				isLegal = true;
-				if (startColumn < endColumn) {
-					for (int i = startColumn + 1; i < endColumn; i++) {
-						if (board[startRow][i] != null) {
+				if (startSqu.getColumn() < endSqu.getColumn()) {
+					for (int i = startSqu.getColumn() + 1; i < endSqu.getColumn(); i++) {
+						if (boardMat.getPieceAt(new Square(false, startSqu.getRow(), i)) != null) {
 							isLegal = false;
 						}
 					}
 				} else {
-					for (int i = startColumn - 1; i > endColumn; i--) {
-						if (board[startRow][i] != null) {
+					for (int i = startSqu.getColumn() - 1; i > endSqu.getColumn(); i--) {
+						if (boardMat.getPieceAt(new Square(false, startSqu.getRow(), i)) != null) {
 							isLegal = false;
 						}
 					}

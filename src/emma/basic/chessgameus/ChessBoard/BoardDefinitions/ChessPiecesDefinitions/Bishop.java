@@ -1,10 +1,12 @@
 package emma.basic.chessgameus.ChessBoard.BoardDefinitions.ChessPiecesDefinitions;
 
 import emma.basic.chessgameus.R;
+import emma.basic.chessgameus.ChessBoard.BoardDefinitions.BoardMatrix;
+import emma.basic.chessgameus.ChessBoard.BoardDefinitions.Square;
 
 public class Bishop extends ChessPiece {
-	public Bishop(int color, int row, int column) {
-		super(color, row, column);
+	public Bishop(int color, Square squ) {
+		super(color, squ);
 	}
 
 	@Override
@@ -17,29 +19,28 @@ public class Bishop extends ChessPiece {
 	}
 
 	@Override
-	public boolean isLegal(ChessPiece[][] board, int startRow, int startColumn,
-			int endRow, int endColumn) {
+	public boolean isLegal(BoardMatrix boardMat, Square startSqu, Square endSqu){
 		Boolean isLegal = false;
-		if (board[endRow][endColumn] != null
-				&& board[endRow][endColumn].getColor() != this.color
-				|| board[endRow][endColumn] == null) {
-			if (startColumn != endColumn) {
-				if (Math.abs(startRow - endRow) == Math.abs(startColumn
-						- endColumn)) {
+		if (boardMat.getPieceAt(endSqu) != null
+				&& boardMat.getPieceAt(endSqu).getColor() != this.color
+				|| boardMat.getPieceAt(endSqu) == null) {
+			if (startSqu.getColumn() != endSqu.getColumn()) {
+				if (Math.abs(startSqu.getRow() - endSqu.getRow()) == Math.abs(startSqu.getColumn()
+						- endSqu.getColumn())) {
 					isLegal = true;
-					if (startRow > endRow) {
-						if (startColumn > endColumn) {
-							int columnDecrementer = startColumn - 1;
-							for (int i = startRow - 1; i > endRow; i--) {
-								if (board[i][columnDecrementer] != null) {
+					if (startSqu.getRow() > endSqu.getRow()) {
+						if (startSqu.getColumn() > endSqu.getColumn()) {
+							int columnDecrementer = startSqu.getColumn() - 1;
+							for (int i = startSqu.getRow() - 1; i > endSqu.getRow(); i--) {
+								if (boardMat.getPieceAt(new Square(false, i, columnDecrementer)) != null) {
 									isLegal = false;
 								}
 								columnDecrementer--;
 							}
 						} else {
-							int columnIncrementer = startColumn + 1;
-							for (int i = startRow - 1; i > endRow; i--) {
-								if (board[i][columnIncrementer] != null) {
+							int columnIncrementer = startSqu.getColumn() + 1;
+							for (int i = startSqu.getRow() - 1; i > endSqu.getRow(); i--) {
+								if (boardMat.getPieceAt(new Square(false, i,columnIncrementer)) != null) {
 									isLegal = false;
 								}
 								columnIncrementer++;
@@ -47,18 +48,18 @@ public class Bishop extends ChessPiece {
 						}
 					} else {
 
-						if (startColumn > endColumn) {
-							int columnDecrementer = startColumn - 1;
-							for (int i = startRow + 1; i < endRow; i++) {
-								if (board[i][columnDecrementer] != null) {
+						if (startSqu.getColumn() > endSqu.getColumn()) {
+							int columnDecrementer = startSqu.getColumn() - 1;
+							for (int i = startSqu.getRow() + 1; i < endSqu.getRow(); i++) {
+								if (boardMat.getPieceAt(new Square(false, i, columnDecrementer)) != null) {
 									isLegal = false;
 								}
 								columnDecrementer--;
 							}
 						} else {
-							int columnIncrementer = startColumn + 1;
-							for (int i = startRow + 1; i < endRow; i++) {
-								if (board[i][columnIncrementer] != null) {
+							int columnIncrementer = startSqu.getColumn() + 1;
+							for (int i = startSqu.getRow() + 1; i < endSqu.getRow(); i++) {
+								if (boardMat.getPieceAt(new Square(false, i, columnIncrementer)) != null) {
 									isLegal = false;
 								}
 								columnIncrementer++;

@@ -1,12 +1,14 @@
 package emma.basic.chessgameus.ChessBoard.BoardDefinitions.ChessPiecesDefinitions;
 
 import emma.basic.chessgameus.R;
+import emma.basic.chessgameus.ChessBoard.BoardDefinitions.BoardMatrix;
+import emma.basic.chessgameus.ChessBoard.BoardDefinitions.Square;
 
 
 
 public class Pawn extends ChessPiece {
-	public Pawn(int color, int row, int column) {
-		super(color, row, column);
+	public Pawn(int color, Square squ) {
+		super(color, squ);
 	}
 
 	@Override
@@ -19,57 +21,58 @@ public class Pawn extends ChessPiece {
 	}
 
 	@Override
-	public boolean isLegal(ChessPiece[][] board, int startRow, int startColumn,
-			int endRow, int endColumn) {
+	public boolean isLegal(BoardMatrix boardMat, Square startSqu, Square endSqu) {
 		Boolean isLegal = false;
-		if (board[endRow][endColumn] != null
-				&& board[endRow][endColumn].getColor() != this.color
-				|| board[endRow][endColumn] == null) {
+		if (boardMat.getPieceAt(endSqu) != null
+				&& boardMat.getPieceAt(endSqu).getColor() != this.color
+				|| boardMat.getPieceAt(endSqu) == null) {
 			if (color == 0) {// white
-				if (startColumn == endColumn) {
-					if (startRow == 6 && endRow == 4 || startRow == endRow + 1) {
-						if (startRow == 6 && endRow == 4) {
+				if (startSqu.getColumn() == endSqu.getColumn()) {
+					if (startSqu.getRow() == 6 && endSqu.getRow() == 4 || startSqu.getRow() == endSqu.getRow() + 1) {
+						if (startSqu.getRow() == 6 && endSqu.getRow() == 4) {
 
-							if (board[endRow][endColumn] == null
-									&& board[endRow + 1][endColumn] == null) {
+							if (boardMat.getPieceAt(endSqu) == null
+									&& boardMat.getPieceAt(
+											new Square(false, endSqu.getRow() + 1, endSqu.getColumn())) == null) {
 								isLegal = true;
 							}
 						} else {
-							if (board[endRow][endColumn] == null) {
+							if (boardMat.getPieceAt(endSqu) == null) {
 								isLegal = true;
 							}
 						}
 					}
-				} else if (startColumn == endColumn - 1
-						&& startRow == endRow + 1
-						|| startColumn == endColumn + 1
-						&& startRow == endRow + 1) {
-					if (board[endRow][endColumn] != null) {
+				} else if (startSqu.getColumn() == endSqu.getColumn() - 1
+						&& startSqu.getRow() == endSqu.getRow() + 1
+						|| startSqu.getColumn() == endSqu.getColumn() + 1
+						&& startSqu.getRow() == endSqu.getRow() + 1) {
+					if (boardMat.getPieceAt(endSqu) != null) {
 						isLegal = true;
 					}
 
 				}
 
 			} else {// black
-				if (startColumn == endColumn) {
-					if (startRow == 1 && endRow == 3 || startRow == endRow - 1) {
-						if (startRow == 1 && endRow == 3) {
+				if (startSqu.getColumn() == endSqu.getColumn()) {
+					if (startSqu.getRow() == 1 && endSqu.getRow() == 3 || startSqu.getRow() == endSqu.getRow() - 1) {
+						if (startSqu.getRow() == 1 && endSqu.getRow() == 3) {
 
-							if (board[endRow][endColumn] == null
-									&& board[endRow - 1][endColumn] == null) {
+							if (boardMat.getPieceAt(endSqu) == null
+									&& boardMat.getPieceAt(
+											new Square(false, endSqu.getRow() - 1, endSqu.getColumn())) == null) {
 								isLegal = true;
 							}
 						} else {
-							if (board[endRow][endColumn] == null) {
+							if (boardMat.getPieceAt(endSqu) == null) {
 								isLegal = true;
 							}
 						}
 					}
-				} else if (startColumn == endColumn - 1
-						&& startRow == endRow - 1
-						|| startColumn == endColumn + 1
-						&& startRow == endRow - 1) {
-					if (board[endRow][endColumn] != null) {
+				} else if (startSqu.getColumn() == endSqu.getColumn() - 1
+						&& startSqu.getRow() == endSqu.getRow() - 1
+						|| startSqu.getColumn() == endSqu.getColumn() + 1
+						&& startSqu.getRow() == endSqu.getRow() - 1) {
+					if (boardMat.getPieceAt(endSqu) != null) {
 						isLegal = true;
 					}
 				}

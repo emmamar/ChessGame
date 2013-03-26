@@ -1,12 +1,14 @@
 package emma.basic.chessgameus.ChessBoard.BoardDefinitions.ChessPiecesDefinitions;
 
 import emma.basic.chessgameus.R;
+import emma.basic.chessgameus.ChessBoard.BoardDefinitions.BoardMatrix;
+import emma.basic.chessgameus.ChessBoard.BoardDefinitions.Square;
 
 
 
 public class King extends ChessPiece {
-	public King(int color, int row, int column) {
-		super(color, row, column);
+	public King(int color, Square squ) {
+		super(color, squ);
 	}
 
 	@Override
@@ -19,16 +21,15 @@ public class King extends ChessPiece {
 	}
 
 	@Override
-	public boolean isLegal(ChessPiece[][] board, int startRow, int startColumn,
-			int endRow, int endColumn) {
+	public boolean isLegal(BoardMatrix boardMat, Square startSqu, Square endSqu) {
 		Boolean isLegal = false;
-		if (board[endRow][endColumn] != null
-				&& board[endRow][endColumn].getColor() != this.color
-				|| board[endRow][endColumn] == null) {
-			if (startColumn == endColumn + 1 || startColumn == endColumn - 1
-					|| startColumn == endColumn) {
-				if (startRow == endRow + 1 || startRow == endRow - 1
-						|| startRow == endRow) {
+		if (boardMat.getPieceAt(endSqu) != null
+				&& boardMat.getPieceAt(endSqu).getColor() != this.color
+				|| boardMat.getPieceAt(endSqu) == null) {
+			if (startSqu.getColumn() == endSqu.getColumn() + 1 || startSqu.getColumn() == endSqu.getColumn() - 1
+					|| startSqu.getColumn() == endSqu.getColumn()) {
+				if (startSqu.getRow() == endSqu.getRow() + 1 || startSqu.getRow() == endSqu.getRow() - 1
+						|| startSqu.getRow() == endSqu.getRow()) {
 					isLegal = true;
 				}
 			}

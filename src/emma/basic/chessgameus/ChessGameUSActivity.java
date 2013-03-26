@@ -26,6 +26,8 @@ public class ChessGameUSActivity extends Activity {
 			public void onClick(View v) {
 				Intent i = new Intent(ChessGameUSActivity.this,
 						ChessPlayActivity.class);
+				        i.putExtra("myText", "computer"); //error if someone names computer
+				        i.putExtra("player", 0);
 				startActivity(i);
 			}
 		});

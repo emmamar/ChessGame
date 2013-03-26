@@ -1,12 +1,14 @@
 package emma.basic.chessgameus.ChessBoard.BoardDefinitions.ChessPiecesDefinitions;
 
 import emma.basic.chessgameus.R;
+import emma.basic.chessgameus.ChessBoard.BoardDefinitions.BoardMatrix;
+import emma.basic.chessgameus.ChessBoard.BoardDefinitions.Square;
 
 
 
 public class Queen extends ChessPiece {
-	public Queen(int color, int row, int column) {
-		super(color, row, column);
+	public Queen(int color, Square squ) {
+		super(color, squ);
 	}
 
 	@Override
@@ -19,30 +21,29 @@ public class Queen extends ChessPiece {
 	}
 
 	@Override
-	public boolean isLegal(ChessPiece[][] board, int startRow, int startColumn,
-			int endRow, int endColumn) {
+	public boolean isLegal(BoardMatrix boardMat, Square startSqu, Square endSqu) {
 		Boolean isLegal = false;
-		if (board[endRow][endColumn] != null
-				&& board[endRow][endColumn].getColor() != this.color
-				|| board[endRow][endColumn] == null) {
+		if (boardMat.getPieceAt(endSqu) != null
+				&& boardMat.getPieceAt(endSqu).getColor() != this.color
+				|| boardMat.getPieceAt(endSqu) == null) {
 			// acts like bishop
-			if (startColumn != endColumn) {
-				if (Math.abs(startRow - endRow) == Math.abs(startColumn
-						- endColumn)) {
+			if (startSqu.getColumn() != endSqu.getColumn()) {
+				if (Math.abs(startSqu.getRow() - endSqu.getRow()) == Math.abs(startSqu.getColumn()
+						- endSqu.getColumn())) {
 					isLegal = true;
-					if (startRow > endRow) {
-						if (startColumn > endColumn) {
-							int columnDecrementer = startColumn - 1;
-							for (int i = startRow - 1; i > endRow; i--) {
-								if (board[i][columnDecrementer] != null) {
+					if (startSqu.getRow() > endSqu.getRow()) {
+						if (startSqu.getColumn() > endSqu.getColumn()) {
+							int columnDecrementer = startSqu.getColumn() - 1;
+							for (int i = startSqu.getRow() - 1; i > endSqu.getRow(); i--) {
+								if (boardMat.getPieceAt(new Square(false, i, columnDecrementer)) != null) {
 									isLegal = false;
 								}
 								columnDecrementer--;
 							}
 						} else {
-							int columnIncrementer = startColumn + 1;
-							for (int i = startRow - 1; i > endRow; i--) {
-								if (board[i][columnIncrementer] != null) {
+							int columnIncrementer = startSqu.getColumn() + 1;
+							for (int i = startSqu.getRow() - 1; i > endSqu.getRow(); i--) {
+								if (boardMat.getPieceAt(new Square(false, i, columnIncrementer)) != null) {
 									isLegal = false;
 								}
 								columnIncrementer++;
@@ -50,18 +51,18 @@ public class Queen extends ChessPiece {
 						}
 					} else {
 
-						if (startColumn > endColumn) {
-							int columnDecrementer = startColumn - 1;
-							for (int i = startRow + 1; i < endRow; i++) {
-								if (board[i][columnDecrementer] != null) {
+						if (startSqu.getColumn() > endSqu.getColumn()) {
+							int columnDecrementer = startSqu.getColumn() - 1;
+							for (int i = startSqu.getRow() + 1; i < endSqu.getRow(); i++) {
+								if (boardMat.getPieceAt(new Square(false, i, columnDecrementer)) != null) {
 									isLegal = false;
 								}
 								columnDecrementer--;
 							}
 						} else {
-							int columnIncrementer = startColumn + 1;
-							for (int i = startRow + 1; i < endRow; i++) {
-								if (board[i][columnIncrementer] != null) {
+							int columnIncrementer = startSqu.getColumn() + 1;
+							for (int i = startSqu.getRow() + 1; i < endSqu.getRow(); i++) {
+								if (boardMat.getPieceAt(new Square(false, i, columnIncrementer)) != null) {
 									isLegal = false;
 								}
 								columnIncrementer++;
@@ -72,32 +73,32 @@ public class Queen extends ChessPiece {
 				}
 			}
 			// or acts like castle
-			if (startColumn == endColumn) {
+			if (startSqu.getColumn() == endSqu.getColumn()) {
 				isLegal = true;
-				if (startRow < endRow) {
-					for (int i = startRow + 1; i < endRow; i++) {
-						if (board[i][startColumn] != null) {
+				if (startSqu.getRow() < endSqu.getRow()) {
+					for (int i = startSqu.getRow() + 1; i < endSqu.getRow(); i++) {
+						if (boardMat.getPieceAt(new Square(false, i, startSqu.getColumn())) != null) {
 							isLegal = false;
 						}
 					}
 				} else {
-					for (int i = startRow - 1; i > endRow; i--) {
-						if (board[i][startColumn] != null) {
+					for (int i = startSqu.getRow() - 1; i > endSqu.getRow(); i--) {
+						if (boardMat.getPieceAt(new Square(false, i, startSqu.getColumn())) != null) {
 							isLegal = false;
 						}
 					}
 				}
-			} else if (startRow == endRow) {
+			} else if (startSqu.getRow() == endSqu.getRow()) {
 				isLegal = true;
-				if (startColumn < endColumn) {
-					for (int i = startColumn + 1; i < endColumn; i++) {
-						if (board[startRow][i] != null) {
+				if (startSqu.getColumn() < endSqu.getColumn()) {
+					for (int i = startSqu.getColumn() + 1; i < endSqu.getColumn(); i++) {
+						if (boardMat.getPieceAt(new Square(false, startSqu.getRow(), i)) != null) {
 							isLegal = false;
 						}
 					}
 				} else {
-					for (int i = startColumn - 1; i > endColumn; i--) {
-						if (board[startRow][i] != null) {
+					for (int i = startSqu.getColumn() - 1; i > endSqu.getColumn(); i--) {
+						if (boardMat.getPieceAt(new Square(false, startSqu.getRow(),i)) != null) {
 							isLegal = false;
 						}
 					}

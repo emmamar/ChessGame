@@ -1,6 +1,6 @@
 package emma.basic.chessgameus.ChessBoard.BoardDefinitions;
 
-public class Square {
+public class Square{
 	int row;
 	int column;
 
@@ -9,9 +9,15 @@ public class Square {
 		this.column = -1;
 	}
 
-	public Square(int X, int Y) {
-		this.row = getColumnRow(X);
-		this.column = getColumnRow(Y);
+	public Square(boolean graphics, int X, int Y) {
+		if(graphics){
+		  this.row = getColumnRow(X);
+		  this.column = getColumnRow(Y);
+		}
+		else{
+		  this.row = X;
+		  this.column = Y;
+		}
 	}
 
 	public void setRow(int row) {
@@ -71,4 +77,5 @@ public class Square {
 		}
 		return 0;
 	}
+	
 }

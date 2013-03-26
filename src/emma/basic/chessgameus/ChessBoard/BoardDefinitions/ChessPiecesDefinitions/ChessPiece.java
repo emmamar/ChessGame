@@ -1,16 +1,17 @@
 package emma.basic.chessgameus.ChessBoard.BoardDefinitions.ChessPiecesDefinitions;
 
+import emma.basic.chessgameus.ChessBoard.BoardDefinitions.BoardMatrix;
 import emma.basic.chessgameus.ChessBoard.BoardDefinitions.Square;
 
 public abstract class ChessPiece {
 	int color;
 	Square square;
 
-	public ChessPiece(int color, int row, int column) {
+	public ChessPiece(int color, Square squ) {
 		this.color = color;
 		square = new Square();
-		square.setRow(row);
-		square.setColumn(column);
+		square.setRow(squ.getRow());
+		square.setColumn(squ.getColumn());
 	}
 
 	public int getColor() {
@@ -28,6 +29,5 @@ public abstract class ChessPiece {
 
 	public abstract int getResourceName();
 
-	public abstract boolean isLegal(ChessPiece[][] board, int startRow,
-			int startColumn, int endRow, int endColumn);
+	public abstract boolean isLegal(BoardMatrix boardMat, Square startSqu, Square endSqu);
 }
