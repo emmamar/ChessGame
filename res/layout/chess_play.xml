@@ -12,18 +12,18 @@
     <GridView
         android:id="@+id/blackPiecesTakenGrid"
         android:layout_width="match_parent"
-        android:layout_height="40px"
+        android:layout_height="40dp"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/playerTurnText"
-        android:layout_marginBottom="10px"
+        android:layout_marginBottom="10dp"
         android:background="#ff8888ff"
         android:numColumns="8" >
     </GridView>
 
     <emma.basic.chessgameus.ChessBoard.BoardDefinitions.ChessBoardView
         android:id="@+id/chessBoardView"
-        android:layout_width="304px"
-        android:layout_height="304px"
+        android:layout_width="304dp"
+        android:layout_height="304dp"
         android:layout_below="@+id/blackPiecesTakenGrid"
         android:layout_centerHorizontal="true"
         android:background="@drawable/chess_board"
@@ -33,10 +33,10 @@
     <GridView
         android:id="@+id/whitePiecesTakenGrid"
         android:layout_width="match_parent"
-        android:layout_height="40px"
+        android:layout_height="40dp"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/chessBoardView"
-        android:layout_marginTop="10px"
+        android:layout_marginTop="10dp"
         android:background="#ff8888ff"
         android:numColumns="8" >
     </GridView>

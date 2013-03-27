@@ -29,13 +29,13 @@ public class Castle extends ChessPiece {
 				isLegal = true;
 				if (startSqu.getRow() < endSqu.getRow()) {
 					for (int i = startSqu.getRow() + 1; i < endSqu.getRow(); i++) {
-						if (boardMat.getPieceAt(new Square(false, i, startSqu.getColumn())) != null) {
+						if (boardMat.getPieceAt(new Square(i, startSqu.getColumn())) != null) {
 							isLegal = false;
 						}
 					}
 				} else {
 					for (int i = startSqu.getRow() - 1; i > endSqu.getRow(); i--) {
-						if (boardMat.getPieceAt(new Square(false, i, startSqu.getColumn())) != null) {
+						if (boardMat.getPieceAt(new Square(i, startSqu.getColumn())) != null) {
 							isLegal = false;
 						}
 					}
@@ -44,13 +44,13 @@ public class Castle extends ChessPiece {
 				isLegal = true;
 				if (startSqu.getColumn() < endSqu.getColumn()) {
 					for (int i = startSqu.getColumn() + 1; i < endSqu.getColumn(); i++) {
-						if (boardMat.getPieceAt(new Square(false, startSqu.getRow(), i)) != null) {
+						if (boardMat.getPieceAt(new Square(startSqu.getRow(), i)) != null) {
 							isLegal = false;
 						}
 					}
 				} else {
 					for (int i = startSqu.getColumn() - 1; i > endSqu.getColumn(); i--) {
-						if (boardMat.getPieceAt(new Square(false, startSqu.getRow(), i)) != null) {
+						if (boardMat.getPieceAt(new Square(startSqu.getRow(), i)) != null) {
 							isLegal = false;
 						}
 					}

@@ -33,7 +33,7 @@ public class Pawn extends ChessPiece {
 
 							if (boardMat.getPieceAt(endSqu) == null
 									&& boardMat.getPieceAt(
-											new Square(false, endSqu.getRow() + 1, endSqu.getColumn())) == null) {
+											new Square(endSqu.getRow() + 1, endSqu.getColumn())) == null) {
 								isLegal = true;
 							}
 						} else {
@@ -59,7 +59,7 @@ public class Pawn extends ChessPiece {
 
 							if (boardMat.getPieceAt(endSqu) == null
 									&& boardMat.getPieceAt(
-											new Square(false, endSqu.getRow() - 1, endSqu.getColumn())) == null) {
+											new Square(endSqu.getRow() - 1, endSqu.getColumn())) == null) {
 								isLegal = true;
 							}
 						} else {

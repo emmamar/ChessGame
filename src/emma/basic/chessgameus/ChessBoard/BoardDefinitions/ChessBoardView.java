@@ -1,5 +1,7 @@
 package emma.basic.chessgameus.ChessBoard.BoardDefinitions;
 
+import java.util.Iterator;
+
 import emma.basic.chessgameus.R;
 import emma.basic.chessgameus.ChessBoard.BoardDefinitions.ChessPiecesDefinitions.ChessPiece;
 
@@ -20,8 +22,8 @@ import android.view.View;
 // **********************************************************************
 public class ChessBoardView extends View {
 
-	private ChessPiece[][] board = new ChessPiece[8][8]; // chessPiece location
-															// matrix
+	private BoardMatrix boardMatrix; // chessPiece location matrix
+	private Paint mPaint;										
 	private Square squareSelected;
 	private boolean evenTouch = false; // even touch highlighted differently
 
@@ -35,13 +37,14 @@ public class ChessBoardView extends View {
 	}
 
 	// sets the board
-	public void setBoard(BoardMatrix boardMatrix) {
-		this.board = boardMatrix.getBoard();
+	public void setBoard(BoardMatrix boardMat) {
+		boardMatrix = boardMat;
+		mPaint = new Paint();
 	}
 
 	// sets the square selected
 	public void setSelectedSquare(Square square) {
-		this.squareSelected = square;
+		squareSelected = square;
 	}
 
 	// sets whether the touch is even or not
@@ -56,19 +59,20 @@ public class ChessBoardView extends View {
 	@Override
 	public void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		Paint mPaint = new Paint();
-		// draw all the pieces on the board
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
-				if (board[i][j] != null) {
-					Drawable drawableInThisPosition = getResources()
-							.getDrawable(board[i][j].getResourceName());
-					Bitmap resizedBitmap = turnDrawableIntoResizedBitmap(
-							drawableInThisPosition, false);
-					canvas.drawBitmap(resizedBitmap, (j) * 38, (i) * 38, mPaint);
-				}
-			}
-		}
+		for(ChessPiece piece: boardMatrix){
+		  if (piece != null) {
+		    Drawable drawableInThisPosition = getResources().getDrawable(piece.getResourceName());
+			Bitmap resizedBitmap = turnDrawableIntoResizedBitmap(drawableInThisPosition, false);
+			float objectToDrawHeight = (piece.getSquare().getColumn()) * 38;
+			float objectToDrawWidth = (piece.getSquare().getRow()) * 38;
+			float density = getResources().getDisplayMetrics().density;
+			objectToDrawHeight *= density;
+			objectToDrawWidth *= density;
+			canvas.drawBitmap(resizedBitmap, objectToDrawHeight,
+					objectToDrawWidth, mPaint);
+		  }
+	    }
+		
 		// if a square has been selected highlight the square
 		if (squareSelected != null) {
 			Drawable drawableSelector;
@@ -81,8 +85,13 @@ public class ChessBoardView extends View {
 			}
 			Bitmap resizedBitmap = turnDrawableIntoResizedBitmap(
 					drawableSelector, true);
-			canvas.drawBitmap(resizedBitmap, (squareSelected.getColumn()) * 38,
-					(squareSelected.getRow()) * 38, mPaint);
+			float objectToDrawHeight = (squareSelected.getColumn()) * 38;
+			float objectToDrawWidth = (squareSelected.getRow()) * 38;
+			float density = getResources().getDisplayMetrics().density;
+			objectToDrawHeight *= density;
+			objectToDrawWidth *= density;
+			canvas.drawBitmap(resizedBitmap, objectToDrawHeight,
+					objectToDrawWidth, mPaint);
 		}
 	}
 
@@ -104,6 +113,11 @@ public class ChessBoardView extends View {
 		int height = bitmapSelector.getHeight();
 		float scaleWidth = ((float) newWidth) / width;
 		float scaleHeight = ((float) newHeight) / height;
+		
+		float density = getResources().getDisplayMetrics().density;
+		scaleWidth *= density;
+		scaleHeight *= density;
+		
 		Matrix matrix = new Matrix();
 		matrix.postScale(scaleWidth, scaleHeight);
 		Bitmap resizedBitmap = Bitmap.createBitmap(bitmapSelector, 0, 0, width,

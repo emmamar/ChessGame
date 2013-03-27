@@ -49,7 +49,7 @@ import android.widget.TextView;
 
 // to do:
 // check mate for other player not working. also restart game should restart both games...
-// make your turn his turn rather than player 1 player 2 for multiplayer..
+// make "your turn his turn" rather than "player 1 player 2" for multiplayer..
 
 // ChessPlayActivity is the main chess game activity. Here the game is played. 
 // ChessPlayActivity creates a BoardMatrix for storing the boards state. 
@@ -57,7 +57,7 @@ import android.widget.TextView;
 public class ChessPlayActivity extends Activity implements OnTouchListener,
 		OnKeyListener {
 	private ChessBoardView chess; // the board view, passed a boardMatrix to
-									// make moves
+								  // make moves
 	private BoardMatrix boardMatrix;
 
 	// state of game variables
@@ -139,7 +139,11 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 	// onTouch is called when the board is touched. The first touch highlights
 	public boolean onTouch(View v, MotionEvent event) {
 		if (event.getAction() == 1) {
-			squareSelected = new Square(true, (int) event.getY(), (int) event.getX());
+			int myY = (int) event.getY();
+			int myX = (int) event.getX();
+			float density = getResources().getDisplayMetrics().density;
+			
+			squareSelected = new Square(myY, myX, density);
 			chess.setSelectedSquare(squareSelected);
 			if (evenTouch) {
 				// If it is the players turn (-1 if not online)
@@ -160,30 +164,15 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 									squareSelected, playerTurn);
 							if (nameOfGame.equals("computer")) {
 								new AsyncGetBoardFromEngine().execute(SOCKET,
-										PORT, Integer
-												.toString(lastSquareSelected
-														.getRow()), Integer
-												.toString(lastSquareSelected
-														.getColumn()), Integer
-												.toString(squareSelected
-														.getRow()), Integer
-												.toString(squareSelected
-														.getColumn()));
+										PORT, lastSquareSelected.toString() +
+											  squareSelected.toString());
 
 							} else {
 								if (playerNumber != -1) {// online game
-									new AsyncAddBoardToServer().execute(SERVER
-											+ FILE_GET_BOARD
-											+ PARAMETER_SET_BOARD + "&name="
-											+ nameOfGame, Integer
-											.toString(lastSquareSelected
-													.getRow()), Integer
-											.toString(lastSquareSelected
-													.getColumn()), Integer
-											.toString(squareSelected.getRow()),
-											Integer.toString(squareSelected
-													.getColumn()), Integer
-													.toString(playerNumber));
+									new AsyncAddBoardToServer().execute(SERVER + FILE_GET_BOARD
+											+ PARAMETER_SET_BOARD + "&name=" + nameOfGame, 
+											lastSquareSelected.toString() + squareSelected.toString(), 
+											Integer.toString(playerNumber));
 								} else {
 									history.addToHistory(boardMatrix);
 									undo.setEnabled(true);
@@ -262,10 +251,9 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 					int mDeletedBoardSize = 0;
 					int mCurrentBoardSize = 0;
 					boolean pieceWasTaken = false;
-					ChessPiece[][] deletedBoard = history.getLastInHistory();
+					BoardMatrix deletedBoard = history.getLastInHistory();
 					history.deleteLastHistory();
-					ChessPiece[][] currentBoard = history.getLastInHistory();
-					boardMatrix.setBoard(currentBoard);
+					boardMatrix = history.getLastInHistory();
 					chess.setBoard(boardMatrix);
 					chess.invalidate();
 					// change player
@@ -277,11 +265,11 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 
 					for (int i = 0; i < 8; i++) {
 						for (int j = 0; j < 8; j++) {
-							if (currentBoard[i][j] != null) {
-								boardMatrix.getBoard()[i][j].setSquare(i, j);
+							if (boardMatrix.getPieceAt(new Square(i, j)) != null) {
+								boardMatrix.getPieceAt(new Square(i, j)).setSquare(i, j);
 								mCurrentBoardSize++;
 							}
-							if (deletedBoard[i][j] != null) {
+							if (deletedBoard.getPieceAt(new Square(i, j)) != null) {
 								mDeletedBoardSize++;
 							}
 						}
@@ -465,13 +453,8 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 		@Override
 		protected Boolean doInBackground(String... params) {
 			nameValuePairs = new ArrayList<NameValuePair>();
-			nameValuePairs.add(new BasicNameValuePair("startRow", params[1]));
-			nameValuePairs
-					.add(new BasicNameValuePair("startColumn", params[2]));
-			nameValuePairs.add(new BasicNameValuePair("endRow", params[3]));
-			nameValuePairs.add(new BasicNameValuePair("endColumn", params[4]));
-			nameValuePairs
-					.add(new BasicNameValuePair("mPlayerTurn", params[5]));
+			nameValuePairs.add(new BasicNameValuePair("move", params[1]));
+			nameValuePairs.add(new BasicNameValuePair("mPlayerTurn", params[2]));
 			// Create a new HttpClient and Post Header
 			HttpClient httpclient = new DefaultHttpClient();
 			HttpPost httppost = new HttpPost(params[0]);
@@ -494,10 +477,7 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 
 	private class AsyncGetBoardFromServer extends
 			AsyncTask<String, String, Boolean> {
-		int gottenStartRow = -1;
-		int gottenStartColumn = -1;
-		int gottenEndRow = -1;
-		int gottenEndColumn = -1;
+		String gottenMove = "";
 		int gottenPlayerTurn = -1;
 
 		@Override
@@ -535,14 +515,7 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 				if (eventType == XmlResourceParser.START_TAG) {
 					String strName = names.getName();
 					if (strName.equals("square")) {
-						gottenStartRow = Integer.parseInt(names
-								.getAttributeValue(null, "startRow"));
-						gottenStartColumn = Integer.parseInt(names
-								.getAttributeValue(null, "startColumn"));
-						gottenEndRow = Integer.parseInt(names
-								.getAttributeValue(null, "endRow"));
-						gottenEndColumn = Integer.parseInt(names
-								.getAttributeValue(null, "endColumn"));
+						gottenMove = names.getAttributeValue(null, "move");
 						gottenPlayerTurn = Integer.parseInt(names
 								.getAttributeValue(null, "mPlayerTurn"));
 					}
@@ -551,8 +524,8 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 			}
 
 			if (gottenPlayerTurn != playerNumber) {
-				boardMatrix.makeMove(new Square(false, gottenStartRow, gottenStartColumn),
-						new Square(false, gottenEndRow, gottenEndColumn), playerTurn);
+				boardMatrix.makeMove(new Square(gottenMove.substring(0,2)),
+						new Square(gottenMove.substring(2)), playerTurn);
 			}
 		}
 
@@ -581,18 +554,10 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 			try {
 				String ip = params[0];
 				int port = Integer.parseInt(params[1]);
-				String startX = params[2];
-				String startY = params[3];
-				String endX = params[4];
-				String endY = params[5];
+				String move = params[2];
 				Socket mySocket = null;
 				PrintWriter out = null;
 				BufferedReader in = null;
-				String[] dictionary = { "a", "b", "c", "d", "e", "f", "g", "h" };
-				String move = dictionary[Integer.parseInt(startY)]
-						+ Integer.toString((7 - Integer.parseInt(startX)) + 1)
-						+ dictionary[Integer.parseInt(endY)]
-						+ Integer.toString((7 - Integer.parseInt(endX)) + 1);
 
 				try {
 					mySocket = new Socket(ip, port);
@@ -609,9 +574,7 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 				}
 
 				out.println(move);
-
 				String computerMove = in.readLine();
-
 				out.close();
 				in.close();
 
@@ -625,26 +588,13 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 		}
 
 		protected void makeMove(String move) {
-			int startRow;
-			int startColumn;
-			int endRow;
-			int endColumn;
-
-			String[] dictionary = { "a", "b", "c", "d", "e", "f", "g", "h" };
-			startColumn = Arrays.asList(dictionary).indexOf(
-					Character.toString(move.charAt(0)));
-			startRow = 7 - (Integer
-					.parseInt(Character.toString(move.charAt(1))) - 1);
-			endColumn = Arrays.asList(dictionary).indexOf(
-					Character.toString(move.charAt(2)));
-			endRow = 7 - (Integer.parseInt(Character.toString(move.charAt(3))) - 1);
-			boardMatrix.makeMove(new Square(false, startRow, startColumn), 
-					new Square(false, endRow, endColumn), 1);
+			Square start = new Square(move.substring(0, 2));
+			Square end = new Square(move.substring(2));
+			boardMatrix.makeMove(start, end, 1);
 		}
 
 		protected void onProgressUpdate(String... values) {
 			playerTurn = 0;
-
 			chess.setBoard(boardMatrix);
 			chess.invalidate();
 			refreshBoardState();

@@ -32,7 +32,7 @@ public class Bishop extends ChessPiece {
 						if (startSqu.getColumn() > endSqu.getColumn()) {
 							int columnDecrementer = startSqu.getColumn() - 1;
 							for (int i = startSqu.getRow() - 1; i > endSqu.getRow(); i--) {
-								if (boardMat.getPieceAt(new Square(false, i, columnDecrementer)) != null) {
+								if (boardMat.getPieceAt(new Square(i, columnDecrementer)) != null) {
 									isLegal = false;
 								}
 								columnDecrementer--;
@@ -40,7 +40,7 @@ public class Bishop extends ChessPiece {
 						} else {
 							int columnIncrementer = startSqu.getColumn() + 1;
 							for (int i = startSqu.getRow() - 1; i > endSqu.getRow(); i--) {
-								if (boardMat.getPieceAt(new Square(false, i,columnIncrementer)) != null) {
+								if (boardMat.getPieceAt(new Square(i,columnIncrementer)) != null) {
 									isLegal = false;
 								}
 								columnIncrementer++;
@@ -51,7 +51,7 @@ public class Bishop extends ChessPiece {
 						if (startSqu.getColumn() > endSqu.getColumn()) {
 							int columnDecrementer = startSqu.getColumn() - 1;
 							for (int i = startSqu.getRow() + 1; i < endSqu.getRow(); i++) {
-								if (boardMat.getPieceAt(new Square(false, i, columnDecrementer)) != null) {
+								if (boardMat.getPieceAt(new Square(i, columnDecrementer)) != null) {
 									isLegal = false;
 								}
 								columnDecrementer--;
@@ -59,7 +59,7 @@ public class Bishop extends ChessPiece {
 						} else {
 							int columnIncrementer = startSqu.getColumn() + 1;
 							for (int i = startSqu.getRow() + 1; i < endSqu.getRow(); i++) {
-								if (boardMat.getPieceAt(new Square(false, i, columnIncrementer)) != null) {
+								if (boardMat.getPieceAt(new Square(i, columnIncrementer)) != null) {
 									isLegal = false;
 								}
 								columnIncrementer++;

@@ -5,17 +5,14 @@ import java.util.ArrayList;
 import emma.basic.chessgameus.ChessBoard.BoardDefinitions.ChessPiecesDefinitions.ChessPiece;
 
 public class History {
-	ArrayList<ChessPiece[][]> history;
+	ArrayList<BoardMatrix> history;
 
 	public History() {
-		history = new ArrayList<ChessPiece[][]>();
+		history = new ArrayList<BoardMatrix>();
 	}
 
 	public void addToHistory(BoardMatrix board) {
-		ChessPiece[][] copy = new ChessPiece[8][8];
-		for (int i = 0; i < 8; i++) {
-			System.arraycopy(board.getBoard()[i], 0, copy[i], 0, 8);
-		}
+		BoardMatrix copy = board.deepCopySelf();
 		history.add(copy);
 	}
 
@@ -23,16 +20,12 @@ public class History {
 		history.remove(history.size() - 1);
 	}
 
-	public ArrayList<ChessPiece[][]> getHistory() {
+	public ArrayList<BoardMatrix> getHistory() {
 		return history;
 	}
 
-	public ChessPiece[][] getLastInHistory() {
-		ChessPiece[][] copyOfBoard = new ChessPiece[8][8];
-		for (int i = 0; i < 8; i++) {
-			System.arraycopy(history.get(history.size() - 1)[i], 0,
-					copyOfBoard[i], 0, 8);
-		}
+	public BoardMatrix getLastInHistory() {
+		BoardMatrix copyOfBoard = history.get(history.size() - 1).deepCopySelf();
 		return copyOfBoard;
 	}
 

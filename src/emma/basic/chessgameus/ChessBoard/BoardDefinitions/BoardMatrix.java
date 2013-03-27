@@ -1,16 +1,16 @@
 package emma.basic.chessgameus.ChessBoard.BoardDefinitions;
 
 import java.util.ArrayList;
-
-import org.apache.http.client.utils.CloneUtils;
+import java.util.Iterator;
 
 import emma.basic.chessgameus.ChessBoard.BoardDefinitions.ChessPiecesDefinitions.*;
 
 //todo: make everything a square rather than startSqu.getRow(), start column.
 
 // BoardMatrix stores board state and checks validity of moves.
-public class BoardMatrix {
+public class BoardMatrix implements Iterable<ChessPiece>{
 	private ChessPiece[][] board;
+	private ArrayList<ChessPiece> longBoard = new ArrayList<ChessPiece>(64);
 	private ChessPiece takenPiece = null;
 	private ChessPiece kingBlackReference;
 	private ChessPiece kingWhiteReference;
@@ -29,17 +29,17 @@ public class BoardMatrix {
 	// positions.
 	public void initialBoardSetup() {
 		// set up board
-		board[0][0] = new Castle(1, new Square(false, 0, 0));
-		board[0][1] = new Knight(1, new Square(false, 0, 1));
-		board[0][2] = new Bishop(1, new Square(false, 0, 2));
-		board[0][3] = new Queen(1, new Square(false, 0, 3));
-		kingBlackReference = new King(1, new Square(false, 0, 4));
+		board[0][0] = new Castle(1, new Square(0, 0));
+		board[0][1] = new Knight(1, new Square(0, 1));
+		board[0][2] = new Bishop(1, new Square(0, 2));
+		board[0][3] = new Queen(1, new Square(0, 3));
+		kingBlackReference = new King(1, new Square(0, 4));
 		board[0][4] = kingBlackReference;
-		board[0][5] = new Bishop(1, new Square(false, 0, 5));
-		board[0][6] = new Knight(1, new Square(false, 0, 6));
-		board[0][7] = new Castle(1, new Square(false, 0, 7));
+		board[0][5] = new Bishop(1, new Square(0, 5));
+		board[0][6] = new Knight(1, new Square(0, 6));
+		board[0][7] = new Castle(1, new Square(0, 7));
 		for (int i = 0; i < 8; i++) {
-			board[1][i] = new Pawn(1, new Square(false, 1, i));
+			board[1][i] = new Pawn(1, new Square(1, i));
 		}
 
 		for (int i = 2; i < 6; i++) {
@@ -49,17 +49,17 @@ public class BoardMatrix {
 		}
 
 		for (int i = 0; i < 8; i++) {
-			board[6][i] = new Pawn(0, new Square(false, 6, i));
+			board[6][i] = new Pawn(0, new Square(6, i));
 		}
-		board[7][0] = new Castle(0, new Square(false, 7, 0));
-		board[7][1] = new Knight(0, new Square(false, 7, 1));
-		board[7][2] = new Bishop(0, new Square(false, 7, 2));
-		board[7][3] = new Queen(0, new Square(false, 7, 3));
-		kingWhiteReference = new King(0, new Square(false, 7, 4));
+		board[7][0] = new Castle(0, new Square(7, 0));
+		board[7][1] = new Knight(0, new Square(7, 1));
+		board[7][2] = new Bishop(0, new Square(7, 2));
+		board[7][3] = new Queen(0, new Square(7, 3));
+		kingWhiteReference = new King(0, new Square(7, 4));
 		board[7][4] = kingWhiteReference;
-		board[7][5] = new Bishop(0, new Square(false, 7, 5));
-		board[7][6] = new Knight(0, new Square(false, 7, 6));
-		board[7][7] = new Castle(0, new Square(false, 7, 7));
+		board[7][5] = new Bishop(0, new Square(7, 5));
+		board[7][6] = new Knight(0, new Square(7, 6));
+		board[7][7] = new Castle(0, new Square(7, 7));
 	}
 
 	public boolean isPlayableMove(Square startSqu, Square endSqu, int playerTurn) {
@@ -69,8 +69,8 @@ public class BoardMatrix {
 			// the player can only move their color.
 			if (playerTurn == 0 && mChessPiece.getColor() == 0
 					|| playerTurn == 1 && mChessPiece.getColor() != 0) {
-				playable = mChessPiece.isLegal(this, new Square(false, startSqu.getRow(),startSqu.getColumn()),
-						new Square(false, endSqu.getRow(), endSqu.getColumn()));
+				playable = mChessPiece.isLegal(this, new Square(startSqu.getRow(),startSqu.getColumn()),
+						new Square(endSqu.getRow(), endSqu.getColumn()));
 			}
 		}
 		return playable;
@@ -83,7 +83,7 @@ public class BoardMatrix {
 		board[endSqu.getRow()][endSqu.getColumn()] = board[startSqu.getRow()][startSqu.getColumn()];
 		board[startSqu.getRow()][startSqu.getColumn()] = null;
 		board[endSqu.getRow()][endSqu.getColumn()].setSquare(endSqu.getRow(), endSqu.getColumn());
-		queenIfPawnReachesBack(this, new Square(false, endSqu.getRow(), endSqu.getColumn()));
+		queenIfPawnReachesBack(this, new Square(endSqu.getRow(), endSqu.getColumn()));
 	}
 
 	public ChessPiece getPieceTaken() {
@@ -118,10 +118,10 @@ public class BoardMatrix {
 		if (!moveAlreadyMade) {
 			copyBoardMat.setPieceAt(endSqu, copyBoardMat.getPieceAt(startSqu));
 			copyBoardMat.setPieceAt(startSqu, null);
-			queenIfPawnReachesBack(copyBoardMat, new Square(false, endSqu.getRow(), endSqu.getColumn()));
+			queenIfPawnReachesBack(copyBoardMat, new Square(endSqu.getRow(), endSqu.getColumn()));
 		}
 		if (playerTurn == 0) {// white
-			kingPos = new Square(false, kingWhiteReference.getSquare().getRow(),
+			kingPos = new Square(kingWhiteReference.getSquare().getRow(),
 			          kingWhiteReference.getSquare().getColumn());
 			if (!moveAlreadyMade) {
 				// if desired move is to move the king must find where it was
@@ -133,12 +133,11 @@ public class BoardMatrix {
 			}
 			for (int i = 0; i < 8; i++) {
 				for (int j = 0; j < 8; j++) {
-					if (copyBoardMat.getPieceAt(new Square(false, i, j)) != null
-							&& copyBoardMat.getPieceAt(new Square(false, i, j)).getColor() != 0) {
-						ChessPiece piece = copyBoardMat.getPieceAt(new Square(false, i, j));
-						isCheck = piece.isLegal(copyBoardMat, new Square(false, i, j), new Square(false,
-								kingPos.getRow(),
-								kingPos.getColumn()));
+					if (copyBoardMat.getPieceAt(new Square(i, j)) != null
+							&& copyBoardMat.getPieceAt(new Square(i, j)).getColor() != 0) {
+						ChessPiece piece = copyBoardMat.getPieceAt(new Square(i, j));
+						isCheck = piece.isLegal(copyBoardMat, new Square(i, j), 
+								new Square(kingPos.getRow(), kingPos.getColumn()));
 					}
 					if (isCheck) {
 						break;
@@ -150,7 +149,7 @@ public class BoardMatrix {
 			}
 		}
 		if (playerTurn == 1) {
-			kingPos = new Square( false, kingBlackReference.getSquare().getRow(),
+			kingPos = new Square(kingBlackReference.getSquare().getRow(),
 			          kingBlackReference.getSquare().getColumn());
 			// if desired move is to move the king must find where it was
 			// moved.
@@ -162,12 +161,11 @@ public class BoardMatrix {
 			}
 			for (int i = 0; i < 8; i++) {
 				for (int j = 0; j < 8; j++) {
-					if (copyBoardMat.getPieceAt(new Square(false, i, j)) != null
-							&& copyBoardMat.getPieceAt(new Square(false, i, j)).getColor() == 0) {
-						ChessPiece piece = copyBoardMat.getPieceAt(new Square(false, i, j));
-						isCheck = piece.isLegal(copyBoardMat, new Square(false, i, j), new Square(false,
-								kingPos.getRow(),
-								kingPos.getColumn()));
+					if (copyBoardMat.getPieceAt(new Square(i, j)) != null
+							&& copyBoardMat.getPieceAt(new Square(i, j)).getColor() == 0) {
+						ChessPiece piece = copyBoardMat.getPieceAt(new Square(i, j));
+						isCheck = piece.isLegal(copyBoardMat, new Square(i, j), 
+								new Square(kingPos.getRow(), kingPos.getColumn()));
 					}
 					if (isCheck) {
 						break;
@@ -202,11 +200,11 @@ public class BoardMatrix {
 						int columnOfPiece = whiteLeft.get(i).getSquare()
 								.getColumn();
 						Boolean isLegal = whiteLeft.get(i).isLegal(this,
-								new Square(false, rowOfPiece, columnOfPiece), new Square(false, j, k));
+								new Square(rowOfPiece, columnOfPiece), new Square(j, k));
 						if (isLegal) {
 							// move the piece then test if still in check.
-							isStillCheck = isInCheck(new Square(false, rowOfPiece, columnOfPiece),
-									new Square(false,j, k), false, playerTurn);
+							isStillCheck = isInCheck(new Square(rowOfPiece, columnOfPiece),
+									new Square(j, k), false, playerTurn);
 							if (!isStillCheck) {
 								return false;
 							}
@@ -234,11 +232,11 @@ public class BoardMatrix {
 						int columnOfPiece = blackLeft.get(i).getSquare()
 								.getColumn();
 						ChessPiece p = blackLeft.get(i);
-						Boolean isLegal = p.isLegal(this, new Square(false, rowOfPiece,
-								columnOfPiece), new Square(false, j, k));
+						Boolean isLegal = p.isLegal(this, new Square(rowOfPiece,
+								columnOfPiece), new Square(j, k));
 						if (isLegal) {
-							isStillCheck = isInCheck(new Square(false, rowOfPiece, columnOfPiece),
-									new Square(false,j, k), false, playerTurn);
+							isStillCheck = isInCheck(new Square(rowOfPiece, columnOfPiece),
+									new Square(j, k), false, playerTurn);
 							if (!isStillCheck) {
 								return false;
 							}
@@ -279,5 +277,15 @@ public class BoardMatrix {
 		}
 
 	}
+	
+	public Iterator<ChessPiece> iterator() {        
+		for(int i = 0; i < 8; i++){
+			for(int j = 0; j < 8; j++){
+				longBoard.add(board[i][j]);
+			}
+		}
+        Iterator<ChessPiece> iprof = longBoard.iterator();
+        return iprof; 
+    }
 
 }
