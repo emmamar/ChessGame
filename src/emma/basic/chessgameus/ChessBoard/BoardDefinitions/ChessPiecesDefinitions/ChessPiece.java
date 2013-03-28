@@ -26,7 +26,14 @@ public abstract class ChessPiece {
 		square.setRow(row);
 		square.setColumn(column);
 	}
+	
+	public void setSquare(Square sq){
+		square.setRow(sq.getRow());
+		square.setColumn(sq.getColumn());
+	}
 
+	public abstract ChessPiece deepCopy();
+	
 	public abstract int getResourceName();
 
 	public abstract boolean isLegal(BoardMatrix boardMat, Square startSqu, Square endSqu);

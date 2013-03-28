@@ -81,5 +81,9 @@ public class Pawn extends ChessPiece {
 		}
 		return isLegal;
 	}
-
+	
+	@Override
+	public ChessPiece deepCopy() {
+		return new Pawn(color, new Square(square.getRow(), square.getColumn()));
+	}
 }

@@ -74,4 +74,9 @@ public class Bishop extends ChessPiece {
 		return isLegal;
 	}
 
+	@Override
+	public ChessPiece deepCopy() {
+		return new Bishop(color, new Square(square.getRow(), square.getColumn()));
+	}
+
 }

@@ -108,5 +108,9 @@ public class Queen extends ChessPiece {
 		return isLegal;
 
 	}
-
+	
+	@Override
+	public ChessPiece deepCopy() {
+		return new Queen(color, new Square(square.getRow(), square.getColumn()));
+	}
 }

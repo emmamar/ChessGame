@@ -9,103 +9,41 @@ import emma.basic.chessgameus.ChessBoard.BoardDefinitions.ChessPiecesDefinitions
 
 // BoardMatrix stores board state and checks validity of moves.
 public class BoardMatrix implements Iterable<ChessPiece>{
-	private ChessPiece[][] board;
-	private ArrayList<ChessPiece> longBoard = new ArrayList<ChessPiece>(64);
+	private ChessBoardRepresentation board;
 	private ChessPiece takenPiece = null;
-	private ChessPiece kingBlackReference;
-	private ChessPiece kingWhiteReference;
 
-	// initializes the board
-	public BoardMatrix() {
-		board = new ChessPiece[8][8];
-		initialBoardSetup();
+	// constructors:
+	public BoardMatrix() { //inital board
+		board = new ChessBoardRepresentation();
 	}
 	
-	public BoardMatrix(ChessPiece[][] bor){
+	public BoardMatrix(ChessBoardRepresentation bor, ChessPiece t) {
 		board = bor;
+		takenPiece = t;
 	}
 
-	// creates all the initial chess pieces and puts them in their starting
-	// positions.
-	public void initialBoardSetup() {
-		// set up board
-		board[0][0] = new Castle(1, new Square(0, 0));
-		board[0][1] = new Knight(1, new Square(0, 1));
-		board[0][2] = new Bishop(1, new Square(0, 2));
-		board[0][3] = new Queen(1, new Square(0, 3));
-		kingBlackReference = new King(1, new Square(0, 4));
-		board[0][4] = kingBlackReference;
-		board[0][5] = new Bishop(1, new Square(0, 5));
-		board[0][6] = new Knight(1, new Square(0, 6));
-		board[0][7] = new Castle(1, new Square(0, 7));
-		for (int i = 0; i < 8; i++) {
-			board[1][i] = new Pawn(1, new Square(1, i));
-		}
-
-		for (int i = 2; i < 6; i++) {
-			for (int j = 0; j < 8; j++) {
-				board[i][j] = null;
-			}
-		}
-
-		for (int i = 0; i < 8; i++) {
-			board[6][i] = new Pawn(0, new Square(6, i));
-		}
-		board[7][0] = new Castle(0, new Square(7, 0));
-		board[7][1] = new Knight(0, new Square(7, 1));
-		board[7][2] = new Bishop(0, new Square(7, 2));
-		board[7][3] = new Queen(0, new Square(7, 3));
-		kingWhiteReference = new King(0, new Square(7, 4));
-		board[7][4] = kingWhiteReference;
-		board[7][5] = new Bishop(0, new Square(7, 5));
-		board[7][6] = new Knight(0, new Square(7, 6));
-		board[7][7] = new Castle(0, new Square(7, 7));
-	}
-
+	//methods to play chess
 	public boolean isPlayableMove(Square startSqu, Square endSqu, int playerTurn) {
 		boolean playable = false;
-		ChessPiece mChessPiece = board[startSqu.getRow()][startSqu.getColumn()];
+		ChessPiece mChessPiece = board.get(startSqu);
 		if (mChessPiece != null) {
 			// the player can only move their color.
 			if (playerTurn == 0 && mChessPiece.getColor() == 0
 					|| playerTurn == 1 && mChessPiece.getColor() != 0) {
-				playable = mChessPiece.isLegal(this, new Square(startSqu.getRow(),startSqu.getColumn()),
-						new Square(endSqu.getRow(), endSqu.getColumn()));
+				playable = mChessPiece.isLegal(this, startSqu, endSqu);
 			}
 		}
 		return playable;
 	}
 
-	public void makeMove(Square startSqu, Square endSqu, int playerTurn) {
-		if (board[endSqu.getRow()][endSqu.getColumn()] != null) {
-			takenPiece = board[endSqu.getRow()][endSqu.getColumn()];
+	public void makeMove(Square startSqu, Square endSqu) {
+		if (board.get(endSqu) != null) {
+			takenPiece = board.get(endSqu);
 		}
-		board[endSqu.getRow()][endSqu.getColumn()] = board[startSqu.getRow()][startSqu.getColumn()];
-		board[startSqu.getRow()][startSqu.getColumn()] = null;
-		board[endSqu.getRow()][endSqu.getColumn()].setSquare(endSqu.getRow(), endSqu.getColumn());
-		queenIfPawnReachesBack(this, new Square(endSqu.getRow(), endSqu.getColumn()));
-	}
-
-	public ChessPiece getPieceTaken() {
-		return takenPiece;
-	}
-
-	public void setPieceTaken() {
-		takenPiece = null;
-	}
-
-	public void restartGame() {
-		takenPiece = null;
-		initialBoardSetup();
-	}
-	
-	public BoardMatrix deepCopySelf(){
-		ChessPiece[][] copyOfBoard = new ChessPiece[8][8];
-		for (int i = 0; i < 8; i++) {
-			System.arraycopy(board[i], 0, copyOfBoard[i], 0, 8);
-		}
-		BoardMatrix mat = new BoardMatrix(copyOfBoard);
-		return mat;
+		board.set(endSqu, board.get(startSqu));
+		board.set(startSqu, null);
+		board.get(endSqu).setSquare(endSqu);
+		queenIfPawnReachesBack(this, endSqu);
 	}
 
 	// use to see if this move is a check move
@@ -121,12 +59,12 @@ public class BoardMatrix implements Iterable<ChessPiece>{
 			queenIfPawnReachesBack(copyBoardMat, new Square(endSqu.getRow(), endSqu.getColumn()));
 		}
 		if (playerTurn == 0) {// white
-			kingPos = new Square(kingWhiteReference.getSquare().getRow(),
-			          kingWhiteReference.getSquare().getColumn());
+			kingPos = new Square(board.getKingWhiteReference().getSquare().getRow(),
+			          board.getKingWhiteReference().getSquare().getColumn());
 			if (!moveAlreadyMade) {
 				// if desired move is to move the king must find where it was
 				// moved.
-				if (board[startSqu.getRow()][startSqu.getColumn()] instanceof King) {
+				if (board.get(startSqu) instanceof King) {
 					kingPos.setRow(endSqu.getRow());
 					kingPos.setColumn(endSqu.getColumn());
 				}
@@ -149,12 +87,12 @@ public class BoardMatrix implements Iterable<ChessPiece>{
 			}
 		}
 		if (playerTurn == 1) {
-			kingPos = new Square(kingBlackReference.getSquare().getRow(),
-			          kingBlackReference.getSquare().getColumn());
+			kingPos = new Square(board.getKingBlackReference().getSquare().getRow(),
+			          board.getKingBlackReference().getSquare().getColumn());
 			// if desired move is to move the king must find where it was
 			// moved.
 			if (!moveAlreadyMade) {
-				if (board[startSqu.getRow()][startSqu.getColumn()] instanceof King) {
+				if (board.get(startSqu) instanceof King) {
 					kingPos.setRow(endSqu.getRow());
 					kingPos.setColumn(endSqu.getColumn());
 				}
@@ -187,8 +125,8 @@ public class BoardMatrix implements Iterable<ChessPiece>{
 			ArrayList<ChessPiece> whiteLeft = new ArrayList<ChessPiece>();
 			for (int i = 0; i < 8; i++) {
 				for (int j = 0; j < 8; j++) {
-					if (board[i][j] != null && board[i][j].getColor() == 0) {
-						whiteLeft.add(board[i][j]);
+					if (board.get(i,j) != null && board.get(i,j).getColor() == 0) {
+						whiteLeft.add(board.get(i,j));
 					}
 				}
 			}
@@ -219,8 +157,8 @@ public class BoardMatrix implements Iterable<ChessPiece>{
 			ArrayList<ChessPiece> blackLeft = new ArrayList<ChessPiece>();
 			for (int i = 0; i < 8; i++) {
 				for (int j = 0; j < 8; j++) {
-					if (board[i][j] != null && board[i][j].getColor() != 0) {
-						blackLeft.add(board[i][j]);
+					if (board.get(i,j) != null && board.get(i,j).getColor() != 0) {
+						blackLeft.add(board.get(i,j));
 					}
 				}
 			}
@@ -247,23 +185,7 @@ public class BoardMatrix implements Iterable<ChessPiece>{
 		}
 		return true;
 	}
-
-	public ChessPiece[][] getBoard() {
-		return board;
-	}
-
-	public void setBoard(ChessPiece[][] board) {
-		this.board = board;
-	}
 	
-	public ChessPiece getPieceAt(Square squ){
-		return board[squ.getRow()][squ.getColumn()];
-	}
-	
-	public void setPieceAt(Square squ, ChessPiece piece){
-		board[squ.getRow()][squ.getColumn()] = piece;
-	}
-
 	private void queenIfPawnReachesBack(BoardMatrix referenceBoard,
 			Square endSqu) {
 		if (referenceBoard.getPieceAt(endSqu) instanceof Pawn) {
@@ -278,14 +200,44 @@ public class BoardMatrix implements Iterable<ChessPiece>{
 
 	}
 	
+	public void restartGame() {
+		takenPiece = null;
+		board.initialBoardSetup();
+	}
+
+	//methods to access pieces and variables
+	public ChessPiece getPieceAt(Square squ){
+		return board.get(squ);
+	}
+	
+	public void setPieceAt(Square squ, ChessPiece piece){
+		board.set(squ, piece);
+	}
+	
+	public ChessPiece getPieceTaken() {
+		return takenPiece;
+	}
+
+	public void setPieceTaken() {
+		takenPiece = null;
+	}
+	
+	//iterate over pieces
 	public Iterator<ChessPiece> iterator() {        
-		for(int i = 0; i < 8; i++){
-			for(int j = 0; j < 8; j++){
-				longBoard.add(board[i][j]);
-			}
-		}
-        Iterator<ChessPiece> iprof = longBoard.iterator();
+        Iterator<ChessPiece> iprof = board.iterator();
         return iprof; 
     }
+	
+	//copy board
+	public BoardMatrix deepCopySelf(){
+		BoardMatrix copyMat;
+		if(takenPiece != null){
+			copyMat = new BoardMatrix(board.deepCopy(), takenPiece.deepCopy());
+		}
+		else{
+		  copyMat = new BoardMatrix(board.deepCopy(), null);
+		}
+		return copyMat;
+	}
 
 }

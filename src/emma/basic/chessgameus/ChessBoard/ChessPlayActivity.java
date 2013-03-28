@@ -56,70 +56,43 @@ import android.widget.TextView;
 // ChessPlayActivity also creates a ChessBoardView which displays the BoardMatrix in a view.
 public class ChessPlayActivity extends Activity implements OnTouchListener,
 		OnKeyListener {
-	private ChessBoardView chess; // the board view, passed a boardMatrix to
-								  // make moves
-	private BoardMatrix boardMatrix;
 
-	// state of game variables
-	private int playerTurn = 0;
-	private ChessPiece takenPiece = null;
-	private History history = new History();
-	private Square squareSelected;
-	private Square lastSquareSelected;
-	private boolean evenTouch = false; // polarity of touch.
-	private boolean isIllegalPutsYouInCheck = false;
-	private boolean isInCheck = false;
-	private boolean isCheckMate = false;
-	private int winner = -1;
+	private static final String DEBUG_TAG = "cool";
 
-	// game info for multiplayer and computer play
-	private String nameOfGame;
-	private int playerNumber;
-
-	// View Objects
-	private TextView playerTurnText; // displays whos turn it is.
-	private GridView blackPiecesTakenGrid;
-	private GridView whitePiecesTakenGrid;
-	private ImageAdapter imageAdaptBlackPiecesTaken;
-	private ImageAdapter imageAdaptWhitePiecesTaken;
-	private Button undo;
-	private Button restartGame;
-	private Button resignGame;
-
-	// server info, used for multiplayer
-	final private String SERVER = "http://128.32.37.29:81/web/chessServer/";
-	final private String FILE_GET_BOARD = "getBoard.php";
-	final private String FILE_GET_GAMES = "getGames.php";
-	final private String PARAMETER_SET_BOARD = "?setBoard=setBoard";
-	final private String PARAMETER_GET_BOARD = "?getBoard=getBoard";
-	final private String PARAMETER_DELETE_GAME = "?deleteGame=deleteGame";
-
-	// socket info used for computer play
-	final private String SOCKET = "128.32.37.29";
-	final private String PORT = "10000";
-
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Bundle extras = getIntent().getExtras();
-		//extras
-		nameOfGame = extras != null ? extras.getString("myText")
-				: "nothing passed in";
-		playerNumber = extras != null ? extras.getInt("player") : -1;
-
-		//set up view
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.chess_play);
-		playerTurnText = (TextView) findViewById(R.id.playerTurnText);
-		blackPiecesTakenGrid = (GridView) findViewById(R.id.blackPiecesTakenGrid);
-		whitePiecesTakenGrid = (GridView) findViewById(R.id.whitePiecesTakenGrid);
-		imageAdaptBlackPiecesTaken = new ImageAdapter(this);
-		imageAdaptWhitePiecesTaken = new ImageAdapter(this);
-		chess = (ChessBoardView) findViewById(R.id.chessBoardView);
-		chess.setOnTouchListener(this);
-		boardMatrix = new BoardMatrix(); //create a new initialized board
-		setUpButtons();
-		setScreenDisplay();
-		chess.setBoard(boardMatrix); //display it on the screen
+		
+		// recover from a stop
+		Bundle saved = savedInstanceState;
+		if (!saved.isEmpty()) {
+			playerTurnText = (TextView) findViewById(R.id.playerTurnText);
+			playerTurnText.setText("Player One's Turn");
+		} else {
+
+			Bundle extras = getIntent().getExtras();
+			// extras
+			nameOfGame = extras != null ? extras.getString("myText")
+					: "nothing passed in";
+			playerNumber = extras != null ? extras.getInt("player") : -1;
+			
+			// set up view
+			playerTurnText = (TextView) findViewById(R.id.playerTurnText);
+			blackPiecesTakenGrid = (GridView) findViewById(R.id.blackPiecesTakenGrid);
+			whitePiecesTakenGrid = (GridView) findViewById(R.id.whitePiecesTakenGrid);
+			imageAdaptBlackPiecesTaken = new ImageAdapter(this);
+			imageAdaptWhitePiecesTaken = new ImageAdapter(this);
+
+			// set up the chess board itself and make touchable
+			chess = (ChessBoardView) findViewById(R.id.chessBoardView);
+			chess.setOnTouchListener(this);
+			boardMatrix = new BoardMatrix(); // create a new initialized board
+			setUpButtons();
+			setScreenDisplay();
+			chess.setBoard(boardMatrix); // display it on the screen
+		}
 
 		// if single player, add initial board to history, if multiplayer check
 		// if its your move and get move from server if not
@@ -129,7 +102,8 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 			if (playerTurn != playerNumber) {
 				// if multiplayer
 				// wait for server to get new move
-				new AsyncGetBoardFromServer().execute(SERVER + FILE_GET_BOARD
+				getBoardServerTask = new AsyncGetBoardFromServer();
+				getBoardServerTask.execute(SERVER + FILE_GET_BOARD
 						+ PARAMETER_GET_BOARD + "&name=" + nameOfGame);
 
 			}
@@ -139,40 +113,57 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 	// onTouch is called when the board is touched. The first touch highlights
 	public boolean onTouch(View v, MotionEvent event) {
 		if (event.getAction() == 1) {
-			int myY = (int) event.getY();
-			int myX = (int) event.getX();
-			float density = getResources().getDisplayMetrics().density;
-			
-			squareSelected = new Square(myY, myX, density);
+			Square squareSelected = new Square((int) event.getY(),
+					(int) event.getX(),
+					getResources().getDisplayMetrics().density);
 			chess.setSelectedSquare(squareSelected);
-			if (evenTouch) {
-				// If it is the players turn (-1 if not online)
+
+			// if its not even touch, just select square
+			if (!evenTouch) {
+				chess.setEvenTouch(evenTouch);
+				evenTouch = true;
+				lastSquareSelected = squareSelected;
+			} else { // try to move to square
+				// If it this devices turn (-1 if multiplayer on same device)
 				if (playerNumber == playerTurn || playerNumber == -1) {
 					boolean playable = boardMatrix.isPlayableMove(
 							lastSquareSelected, squareSelected, playerTurn);
-					// Check playable. Playable if player moves right color, is
-					// not moving a blank square and follows rules of pieces.
+					// Check playable.
 					if (playable) {
 						isIllegalPutsYouInCheck = boardMatrix.isInCheck(
-								lastSquareSelected, squareSelected, false, playerTurn);
+								lastSquareSelected, squareSelected, false,
+								playerTurn);
 						// check isIllegalPutsYouInCheck.
-						// isIllegalPutsYouInCheck if player turies to move into
-						// a check position
 						if (!isIllegalPutsYouInCheck) {
 							// move the piece.
 							boardMatrix.makeMove(lastSquareSelected,
-									squareSelected, playerTurn);
+									squareSelected);
+							// if playing a computer
+							// tell the computer on server the move and it makes
+							// it's move
 							if (nameOfGame.equals("computer")) {
-								new AsyncGetBoardFromEngine().execute(SOCKET,
-										PORT, lastSquareSelected.toString() +
-											  squareSelected.toString());
-
+								getBoardEngineTask = new AsyncGetBoardFromEngine();
+								getBoardEngineTask.execute(SOCKET, PORT,
+										lastSquareSelected.toString()
+												+ squareSelected.toString());
 							} else {
-								if (playerNumber != -1) {// online game
-									new AsyncAddBoardToServer().execute(SERVER + FILE_GET_BOARD
-											+ PARAMETER_SET_BOARD + "&name=" + nameOfGame, 
-											lastSquareSelected.toString() + squareSelected.toString(), 
-											Integer.toString(playerNumber));
+								// if online game
+								if (playerNumber != -1) {
+									// tell server the move and other player
+									// makes their move
+									addBoardServerTask = new AsyncAddBoardToServer();
+									addBoardServerTask
+											.execute(
+													SERVER
+															+ FILE_GET_BOARD
+															+ PARAMETER_SET_BOARD
+															+ "&name="
+															+ nameOfGame,
+													lastSquareSelected
+															.toString()
+															+ squareSelected
+																	.toString(),
+													Integer.toString(playerNumber));
 								} else {
 									history.addToHistory(boardMatrix);
 									undo.setEnabled(true);
@@ -184,14 +175,14 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 									playerTurn = 0;
 								}
 								isInCheck = boardMatrix.isInCheck(
-									lastSquareSelected, squareSelected, true, playerTurn);
-								// check isInCheck. isInCheck if the move puts
-								// the
-								// next player in check
+										lastSquareSelected, squareSelected,
+										true, playerTurn);
+								// check other player isInCheck after move
 								if (isInCheck) {
 									// check if this check is check mate.
 									isCheckMate = boardMatrix.isCheckMate(
-											lastSquareSelected, squareSelected, playerTurn);
+											lastSquareSelected, squareSelected,
+											playerTurn);
 									if (isCheckMate) {
 										if (playerTurn == 0) {
 											winner = 1;
@@ -208,22 +199,19 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 				}
 				chess.setEvenTouch(evenTouch);
 				evenTouch = false;
-			} else {
-				chess.setEvenTouch(evenTouch);
-				evenTouch = true;
-				lastSquareSelected = squareSelected;
 			}
-
 			refreshBoardState();
 		}
 		return false;
 	}
 
+	// if back button pressed during game, delete game from server
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			if (playerNumber == 0) {
-				new AsyncDeleteGameFromServer().execute(SERVER + FILE_GET_GAMES
+				deleteGameServer = new AsyncDeleteGameFromServer();
+				deleteGameServer.execute(SERVER + FILE_GET_GAMES
 						+ PARAMETER_DELETE_GAME);
 			}
 			finish();
@@ -266,7 +254,8 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 					for (int i = 0; i < 8; i++) {
 						for (int j = 0; j < 8; j++) {
 							if (boardMatrix.getPieceAt(new Square(i, j)) != null) {
-								boardMatrix.getPieceAt(new Square(i, j)).setSquare(i, j);
+								boardMatrix.getPieceAt(new Square(i, j))
+										.setSquare(i, j);
 								mCurrentBoardSize++;
 							}
 							if (deletedBoard.getPieceAt(new Square(i, j)) != null) {
@@ -281,12 +270,10 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 
 					if (pieceWasTaken && playerTurn == 1) {
 						imageAdaptBlackPiecesTaken.removeLastImage();
-						blackPiecesTakenGrid
-								.setAdapter(imageAdaptBlackPiecesTaken);
+						blackPiecesTakenGrid.setAdapter(imageAdaptBlackPiecesTaken);
 					} else if (pieceWasTaken && playerTurn == 0) {
 						imageAdaptWhitePiecesTaken.removeLastImage();
-						whitePiecesTakenGrid
-								.setAdapter(imageAdaptWhitePiecesTaken);
+						whitePiecesTakenGrid.setAdapter(imageAdaptWhitePiecesTaken);
 					}
 					if (playerTurn == 1) {
 						playerTurnText.setText("Player Two's Turn");
@@ -322,8 +309,9 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 		resignGame.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				if (playerNumber != -1) {
-					new AsyncDeleteGameFromServer().execute(SERVER
-							+ FILE_GET_GAMES + PARAMETER_DELETE_GAME);
+					deleteGameServer = new AsyncDeleteGameFromServer();
+					deleteGameServer.execute(SERVER + FILE_GET_GAMES
+							+ PARAMETER_DELETE_GAME);
 				}
 				finish();
 			}
@@ -454,7 +442,8 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 		protected Boolean doInBackground(String... params) {
 			nameValuePairs = new ArrayList<NameValuePair>();
 			nameValuePairs.add(new BasicNameValuePair("move", params[1]));
-			nameValuePairs.add(new BasicNameValuePair("mPlayerTurn", params[2]));
+			nameValuePairs
+					.add(new BasicNameValuePair("mPlayerTurn", params[2]));
 			// Create a new HttpClient and Post Header
 			HttpClient httpclient = new DefaultHttpClient();
 			HttpPost httppost = new HttpPost(params[0]);
@@ -466,11 +455,13 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 			} catch (ClientProtocolException e) {
 			} catch (IOException e) {
 			}
+
 			return null;
 		}
 
 		protected void onPostExecute(Boolean result) {
-			new AsyncGetBoardFromServer().execute(SERVER + FILE_GET_BOARD
+			getBoardServerTask = new AsyncGetBoardFromServer();
+			getBoardServerTask.execute(SERVER + FILE_GET_BOARD
 					+ PARAMETER_GET_BOARD + "&name=" + nameOfGame);
 		}
 	}
@@ -502,6 +493,8 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 					}
 				} catch (Exception e) {
 				}
+				if (isCancelled())
+					break;
 			}
 			gottenPlayerTurn = -1;
 			publishProgress();
@@ -524,8 +517,8 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 			}
 
 			if (gottenPlayerTurn != playerNumber) {
-				boardMatrix.makeMove(new Square(gottenMove.substring(0,2)),
-						new Square(gottenMove.substring(2)), playerTurn);
+				boardMatrix.makeMove(new Square(gottenMove.substring(0, 2)),
+						new Square(gottenMove.substring(2)));
 			}
 		}
 
@@ -590,7 +583,7 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 		protected void makeMove(String move) {
 			Square start = new Square(move.substring(0, 2));
 			Square end = new Square(move.substring(2));
-			boardMatrix.makeMove(start, end, 1);
+			boardMatrix.makeMove(start, end);
 		}
 
 		protected void onProgressUpdate(String... values) {
@@ -599,6 +592,107 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 			chess.invalidate();
 			refreshBoardState();
 		}
+
 	}
 
+	@Override
+	protected void onStart() {
+		super.onStart();
+		// The activity is about to become visible.
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		// The activity has become visible (it is now "resumed").
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		// Another activity is taking focus (this activity is about to be
+		// "paused").
+	}
+
+	@Override
+    protected void onStop() {
+    	Bundle b = new Bundle();
+    	
+    	b.boardMatrix;
+        playerTurn;
+    	takenPiece;
+    	history;
+    	lastSquareSelected;
+    	evenTouch;
+    	isIllegalPutsYouInCheck;
+    	isInCheck;
+    	isCheckMate;
+    	winner;
+        nameOfGame;
+    	playerNumber;
+        playerTurnText;
+    	
+    	onSaveInstanceState(b);
+        super.onStop();
+        // The activity is no longer visible (it is now "stopped")
+    }
+
+	@Override
+	protected void onDestroy() {
+
+		// getBoardServerTask.cancel(true);
+		// deleteGameServer.cancel(true);
+		// getBoardEngineTask.cancel(true);
+		// addBoardServerTask.cancel(true);
+		super.onDestroy();
+		// The activity is about to be destroyed.
+	}
+
+	// variable declarations
+	private ChessBoardView chess; // the board view, passed a boardMatrix to
+	// make moves
+	private BoardMatrix boardMatrix;
+
+	// state of game variables
+	private int playerTurn = 0;
+	private ChessPiece takenPiece = null;
+	private History history = new History();
+
+	private Square lastSquareSelected;
+	private boolean evenTouch = false; // polarity of touch.
+	private boolean isIllegalPutsYouInCheck = false;
+	private boolean isInCheck = false;
+	private boolean isCheckMate = false;
+	private int winner = -1;
+
+	// game info for multiplayer and computer play
+	private String nameOfGame;
+	private int playerNumber;
+
+	// View Objects
+	private TextView playerTurnText; // displays whos turn it is.
+	private GridView blackPiecesTakenGrid;
+	private GridView whitePiecesTakenGrid;
+	private ImageAdapter imageAdaptBlackPiecesTaken;
+	private ImageAdapter imageAdaptWhitePiecesTaken;
+	private Button undo;
+	private Button restartGame;
+	private Button resignGame;
+
+	// server info, used for multiplayer
+	final private String SERVER = "http://128.32.37.29:81/web/chessServer/";
+	final private String FILE_GET_BOARD = "getBoard.php";
+	final private String FILE_GET_GAMES = "getGames.php";
+	final private String PARAMETER_SET_BOARD = "?setBoard=setBoard";
+	final private String PARAMETER_GET_BOARD = "?getBoard=getBoard";
+	final private String PARAMETER_DELETE_GAME = "?deleteGame=deleteGame";
+
+	// socket info used for computer play
+	final private String SOCKET = "128.32.37.29";
+	final private String PORT = "10000";
+
+	private AsyncGetBoardFromServer getBoardServerTask;
+	private AsyncDeleteGameFromServer deleteGameServer;
+	private AsyncGetBoardFromEngine getBoardEngineTask;
+	private AsyncAddBoardToServer addBoardServerTask;
 }

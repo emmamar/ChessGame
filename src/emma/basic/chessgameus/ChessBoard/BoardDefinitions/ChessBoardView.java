@@ -1,7 +1,5 @@
 package emma.basic.chessgameus.ChessBoard.BoardDefinitions;
 
-import java.util.Iterator;
-
 import emma.basic.chessgameus.R;
 import emma.basic.chessgameus.ChessBoard.BoardDefinitions.ChessPiecesDefinitions.ChessPiece;
 
