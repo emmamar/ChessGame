@@ -40,4 +40,13 @@ public class King extends ChessPiece {
 	public ChessPiece deepCopy() {
 		return new King(color, new Square(square.getRow(), square.getColumn()));
 	}
+	
+	public String toString(){
+		if(color == 1){
+			return "KB";
+		}
+		else{
+			return "KW";
+		}
+	}
 }

@@ -6,12 +6,17 @@ import emma.basic.chessgameus.ChessBoard.BoardDefinitions.Square;
 public abstract class ChessPiece {
 	int color;
 	Square square;
+	String pieceStr;
 
 	public ChessPiece(int color, Square squ) {
 		this.color = color;
 		square = new Square();
 		square.setRow(squ.getRow());
 		square.setColumn(squ.getColumn());
+	}
+	
+	public ChessPiece(String str){
+		pieceStr = str;
 	}
 
 	public int getColor() {
@@ -31,10 +36,15 @@ public abstract class ChessPiece {
 		square.setRow(sq.getRow());
 		square.setColumn(sq.getColumn());
 	}
+	
+	
+	
+	public abstract String toString();
 
 	public abstract ChessPiece deepCopy();
 	
 	public abstract int getResourceName();
 
 	public abstract boolean isLegal(BoardMatrix boardMat, Square startSqu, Square endSqu);
+
 }

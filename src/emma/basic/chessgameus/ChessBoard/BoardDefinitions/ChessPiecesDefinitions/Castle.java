@@ -65,4 +65,13 @@ public class Castle extends ChessPiece {
 	public ChessPiece deepCopy() {
 		return new Castle(color, new Square(square.getRow(), square.getColumn()));
 	}
+	
+	public String toString(){
+		if(color == 1){
+			return "CB";
+		}
+		else{
+			return "CW";
+		}
+	}
 }

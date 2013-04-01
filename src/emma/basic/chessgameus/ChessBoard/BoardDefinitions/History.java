@@ -32,5 +32,13 @@ public class History {
 	public int getSize() {
 		return history.size();
 	}
+	
+	public String[] toStringArray(){
+		String[] str = new String[history.size()];
+		for(int i = 0; i < str.length; i++){
+		    str[i] = history.get(i).toString();
+		}
+		return str;
+	}
 
 }

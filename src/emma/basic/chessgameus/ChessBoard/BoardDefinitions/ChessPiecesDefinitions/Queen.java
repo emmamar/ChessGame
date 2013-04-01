@@ -113,4 +113,13 @@ public class Queen extends ChessPiece {
 	public ChessPiece deepCopy() {
 		return new Queen(color, new Square(square.getRow(), square.getColumn()));
 	}
+	
+	public String toString(){
+		if(color == 1){
+			return "QB";
+		}
+		else{
+			return "QW";
+		}
+	}
 }

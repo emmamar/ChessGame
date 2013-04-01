@@ -57,8 +57,6 @@ import android.widget.TextView;
 public class ChessPlayActivity extends Activity implements OnTouchListener,
 		OnKeyListener {
 
-	private static final String DEBUG_TAG = "cool";
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -67,9 +65,35 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 		
 		// recover from a stop
 		Bundle saved = savedInstanceState;
-		if (!saved.isEmpty()) {
+		if (saved != null) {
+			boardMatrix = new BoardMatrix(saved.getString("boardMatrix"), saved.getString("takenBlack"),
+					saved.getString("takenWhite"));
+			playerTurn = saved.getInt("playerTurn");
+			for(String historyBoardString: saved.getStringArray("history")){
+			    history.addToHistory(new BoardMatrix(historyBoardString));
+			}
+			isIllegalPutsYouInCheck = saved.getBoolean("isIllegalPutsYouInCheck");
+			isInCheck = saved.getBoolean("isInCheck");
+			isCheckMate = saved.getBoolean("isCheckMate");
+			winner = saved.getInt("winner");
+			nameOfGame = saved.getString("nameOfGame");
+			playerNumber = saved.getInt("playerNumber");
+			
 			playerTurnText = (TextView) findViewById(R.id.playerTurnText);
-			playerTurnText.setText("Player One's Turn");
+			if(playerTurn == 0){
+			    playerTurnText.setText("Player One's Turn");
+			} else{
+				 playerTurnText.setText("Player Two's Turn");
+			}
+			blackPiecesTakenGrid = (GridView) findViewById(R.id.blackPiecesTakenGrid);
+			whitePiecesTakenGrid = (GridView) findViewById(R.id.whitePiecesTakenGrid);
+			imageAdaptBlackPiecesTaken = new ImageAdapter(this);
+			imageAdaptWhitePiecesTaken = new ImageAdapter(this);
+			chess = (ChessBoardView) findViewById(R.id.chessBoardView);
+			chess.setOnTouchListener(this);
+			setUpButtons();
+			setScreenDisplay();
+			chess.setBoard(boardMatrix);
 		} else {
 
 			Bundle extras = getIntent().getExtras();
@@ -269,9 +293,11 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 					}
 
 					if (pieceWasTaken && playerTurn == 1) {
+						boardMatrix.removeLastWhiteTaken();
 						imageAdaptBlackPiecesTaken.removeLastImage();
 						blackPiecesTakenGrid.setAdapter(imageAdaptBlackPiecesTaken);
 					} else if (pieceWasTaken && playerTurn == 0) {
+						boardMatrix.removeLastBlackTaken();
 						imageAdaptWhitePiecesTaken.removeLastImage();
 						whitePiecesTakenGrid.setAdapter(imageAdaptWhitePiecesTaken);
 					}
@@ -326,7 +352,8 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 	}
 
 	private void setScreenDisplay() {
-		takenPiece = boardMatrix.getPieceTaken();
+		takenBlack = boardMatrix.getBlackTaken();
+		takenWhite = boardMatrix.getWhiteTaken();
 		if (playerTurn == 0 && playerNumber == -1 || playerNumber != playerTurn
 				&& playerTurn == 0) {
 			playerTurnText.setText("Player One's Turn");
@@ -337,12 +364,17 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 			playerTurnText.setText("Your turn");
 		}
 
-		if (takenPiece != null && playerTurn == 0) {
-			imageAdaptBlackPiecesTaken.addImage(takenPiece.getResourceName());
-		} else if (takenPiece != null && playerTurn == 1) {
-			imageAdaptWhitePiecesTaken.addImage(takenPiece.getResourceName());
+		if (takenWhite != null && playerTurn == 0) {
+			imageAdaptBlackPiecesTaken.clearAdapter();
+			for(ChessPiece piece: takenWhite){
+			    imageAdaptBlackPiecesTaken.addImage(piece.getResourceName());
+			}
+		} else if (takenBlack != null && playerTurn == 1) {
+			imageAdaptWhitePiecesTaken.clearAdapter();
+			for(ChessPiece piece: takenBlack){
+			    imageAdaptWhitePiecesTaken.addImage(piece.getResourceName());
+			}
 		}
-		boardMatrix.setPieceTaken();
 
 		blackPiecesTakenGrid.setAdapter(imageAdaptBlackPiecesTaken);
 		whitePiecesTakenGrid.setAdapter(imageAdaptWhitePiecesTaken);
@@ -616,26 +648,47 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 
 	@Override
     protected void onStop() {
-    	Bundle b = new Bundle();
-    	
-    	b.boardMatrix;
-        playerTurn;
-    	takenPiece;
-    	history;
-    	lastSquareSelected;
-    	evenTouch;
-    	isIllegalPutsYouInCheck;
-    	isInCheck;
-    	isCheckMate;
-    	winner;
-        nameOfGame;
-    	playerNumber;
-        playerTurnText;
-    	
-    	onSaveInstanceState(b);
+		Bundle b = new Bundle();
+		onSaveInstanceState(b);
         super.onStop();
+        
         // The activity is no longer visible (it is now "stopped")
     }
+	
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+	    // Save the user's current game state
+		savedInstanceState.putString("boardMatrix", boardMatrix.toString());
+		savedInstanceState.putInt("playerTurn", playerTurn);
+        if(takenBlack.size() == 0){
+        	savedInstanceState.putString("takenBlack", null);
+        }else{
+        	String takenBlackString = "";
+        	for(ChessPiece piece: takenBlack){
+        	    takenBlackString += piece.toString() + " ";
+        	}
+        	savedInstanceState.putString("takenBlack", takenBlackString);
+        }
+        if(takenWhite.size() == 0){
+        	savedInstanceState.putString("takenWhite", null);
+        }else{
+        	String takenWhiteString = "";
+        	for(ChessPiece piece: takenWhite){
+        	    takenWhiteString += piece.toString() + " ";
+        	}
+        	savedInstanceState.putString("takenWhite", takenWhiteString);
+        }
+        savedInstanceState.putStringArray("history", history.toStringArray());
+        savedInstanceState.putBoolean("isIllegalPutsYouInCheck", isIllegalPutsYouInCheck);
+        savedInstanceState.putBoolean("isInCheck", isInCheck);
+        savedInstanceState.putBoolean("isCheckMate", isCheckMate);
+        savedInstanceState.putInt("winner", winner);
+        savedInstanceState.putString("nameOfGame", nameOfGame);
+        savedInstanceState.putInt("playerNumber", playerNumber);
+	    
+	    // Always call the superclass so it can save the view hierarchy state
+	    super.onSaveInstanceState(savedInstanceState);
+	}
 
 	@Override
 	protected void onDestroy() {
@@ -655,7 +708,8 @@ public class ChessPlayActivity extends Activity implements OnTouchListener,
 
 	// state of game variables
 	private int playerTurn = 0;
-	private ChessPiece takenPiece = null;
+	private ArrayList<ChessPiece> takenBlack = null;
+	private ArrayList<ChessPiece> takenWhite = null;
 	private History history = new History();
 
 	private Square lastSquareSelected;

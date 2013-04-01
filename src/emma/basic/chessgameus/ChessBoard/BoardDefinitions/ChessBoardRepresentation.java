@@ -26,6 +26,43 @@ public class ChessBoardRepresentation implements Iterable<ChessPiece>{
 		kingWhiteReference = kingW;
 	}
 	
+	public ChessBoardRepresentation(String str){
+		longBoard = new ArrayList<ChessPiece>(64);
+		String[] rows = str.split("\n");
+		for (int i = 0; i < rows.length; i++){
+	        String[] pieces = rows[i].split(" ");
+	        for(int j = 0; j < pieces.length; j++){
+	            int color = 0;
+			    if(pieces[j].substring(1).equals("B")){
+			    	color = 1;
+			    }
+			    if(pieces[j].substring(0, 1).equals("B")){
+			    	longBoard.add(new Bishop(color, new Square(i, j)));
+			    } else if (pieces[j].substring(0, 1).equals("K")){
+			    	if(color == 1){
+			    		kingBlackReference = new King(color, new Square(i, j));
+			    		longBoard.add(kingBlackReference);
+			    	}
+			    	else {
+			    		kingWhiteReference = new King(color, new Square(i, j));
+			    		longBoard.add(kingWhiteReference);
+			    	}
+			    } else if (pieces[j].substring(0, 1).equals("Q")){
+			    	longBoard.add(new Queen(color, new Square(i, j)));
+			    } else if (pieces[j].substring(0, 1).equals("N")){
+			    	longBoard.add(new Knight(color, new Square(i, j)));
+			    } else if (pieces[j].substring(0, 1).equals("P")){
+			    	longBoard.add(new Pawn(color, new Square(i, j)));
+			    } else if (pieces[j].substring(0, 1).equals("C")){
+			    	longBoard.add(new Castle(color, new Square(i, j)));
+			    } else {
+			    	longBoard.add(null);
+			    }
+	        }
+		}
+	}
+	
+	
 	public void initialBoardSetup(){
 		longBoard = new ArrayList<ChessPiece>(64);
 		// set up board
@@ -114,5 +151,31 @@ public class ChessBoardRepresentation implements Iterable<ChessPiece>{
 	public Iterator<ChessPiece> iterator() {
 		Iterator<ChessPiece> iprof = longBoard.iterator();
         return iprof; 
+	}
+	
+	public String toString(){
+		String str = "";
+		int column = 0;
+	    for(ChessPiece w: longBoard){
+	    	if(column < 7){
+	    		if(w == null){
+	    			str += "00" + " ";
+	    		}
+	    		else{
+	    	        str += w.toString() + " ";
+	    		}
+	    		column++;
+	    	}
+	    	else if(column == 7){
+	    		if(w == null){
+	    			str += "00" + "\n";
+	    		}
+	    		else{
+	    		    str += w.toString() + "\n";
+	    		}
+	    		column = 0;
+	    	}
+	    }
+	    return str;
 	}
 }

@@ -86,4 +86,13 @@ public class Pawn extends ChessPiece {
 	public ChessPiece deepCopy() {
 		return new Pawn(color, new Square(square.getRow(), square.getColumn()));
 	}
+	
+	public String toString(){
+		if(color == 1){
+			return "PB";
+		}
+		else{
+			return "PW";
+		}
+	}
 }

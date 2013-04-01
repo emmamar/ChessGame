@@ -41,4 +41,13 @@ public class Knight extends ChessPiece {
 	public ChessPiece deepCopy() {
 		return new Knight(color, new Square(square.getRow(), square.getColumn()));
 	}
+	
+	public String toString(){
+		if(color == 1){
+			return "NB";
+		}
+		else{
+			return "NW";
+		}
+	}
 }
