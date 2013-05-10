@@ -22,8 +22,8 @@
 
     <emma.basic.chessgameus.ChessBoard.BoardDefinitions.ChessBoardView
         android:id="@+id/chessBoardView"
-        android:layout_width="304dp"
-        android:layout_height="304dp"
+        android:layout_width="350dp"
+        android:layout_height="fill_parent"
         android:layout_centerHorizontal="true"
         android:background="@drawable/chess_board"
         android:clickable="true"

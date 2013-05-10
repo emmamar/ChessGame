@@ -8,91 +8,28 @@ import emma.basic.chessgameus.ChessBoard.BoardDefinitions.ChessPiecesDefinitions
 //todo: make everything a square rather than startSqu.getRow(), start column.
 
 // BoardMatrix stores board state and checks validity of moves.
-public class BoardMatrix implements Iterable<ChessPiece> {
-	private ChessBoardRepresentation board;
-	private ArrayList<ChessPiece> takenBlack;
-	private ArrayList<ChessPiece> takenWhite;
+public class BoardMatrix extends ChessBoardRepresentation implements
+		Iterable<ChessPiece> {
 
 	// constructors:
 	public BoardMatrix() { // inital board
-		board = new ChessBoardRepresentation();
-		takenBlack = new ArrayList<ChessPiece>(16);
-		takenWhite = new ArrayList<ChessPiece>(16);
+		super();
 	}
 
-	public BoardMatrix(ChessBoardRepresentation bor, ArrayList<ChessPiece> tB,
-			ArrayList<ChessPiece> tW) {
-		board = bor;
-		takenBlack = tB;
-		takenWhite = tW;
-	}
-	
-	public BoardMatrix(String boardString) {
-		board = new ChessBoardRepresentation(boardString);
+	public BoardMatrix(String[] boardString) {
+		super(boardString);
 	}
 
-	public BoardMatrix(String boardString, String tB, String tW) {
-		board = new ChessBoardRepresentation(boardString);
-		takenBlack = new ArrayList<ChessPiece>(16);
-		takenWhite = new ArrayList<ChessPiece>(16);
-		if(tB != null){
-		    String[] piecesB = tB.split(" ");
-		    for (int i = 0; i < piecesB.length; i++) {
-				int color = 0;
-				if (piecesB[i].substring(1).equals("B")) {
-					color = 1;
-				}
-				if (piecesB[i].substring(0, 1).equals("B")) {
-					takenBlack.add(new Bishop(color, new Square(0, 0)));
-				} else if (piecesB[i].substring(0, 1).equals("K")) {
-					if (color == 1) {
-						takenBlack.add(new King(color, new Square(0, 0)));
-					} else {
-						takenBlack.add(new King(color, new Square(0, 0)));
-					}
-				} else if (piecesB[i].substring(0, 1).equals("Q")) {
-					takenBlack.add(new Queen(color, new Square(0, 0)));
-				} else if (piecesB[i].substring(0, 1).equals("N")) {
-					takenBlack.add(new Knight(color, new Square(0, 0)));
-				} else if (piecesB[i].substring(0, 1).equals("P")) {
-					takenBlack.add(new Pawn(color, new Square(0, 0)));
-				} else if (piecesB[i].substring(0, 1).equals("C")) {
-					takenBlack.add(new Castle(color, new Square(0, 0)));
-				}
-			}
-		}
-		if(tW != null){
-	        String[] piecesW = tW.split(" ");
-	        for (int i = 0; i < piecesW.length; i++) {
-				int color = 0;
-				if (piecesW[i].substring(1).equals("B")) {
-					color = 1;
-				}
-				if (piecesW[i].substring(0, 1).equals("B")) {
-					takenBlack.add(new Bishop(color, new Square(0, 0)));
-				} else if (piecesW[i].substring(0, 1).equals("K")) {
-					if (color == 1) {
-						takenBlack.add(new King(color, new Square(0, 0)));
-					} else {
-						takenBlack.add(new King(color, new Square(0, 0)));
-					}
-				} else if (piecesW[i].substring(0, 1).equals("Q")) {
-					takenBlack.add(new Queen(color, new Square(0, 0)));
-				} else if (piecesW[i].substring(0, 1).equals("N")) {
-					takenBlack.add(new Knight(color, new Square(0, 0)));
-				} else if (piecesW[i].substring(0, 1).equals("P")) {
-					takenBlack.add(new Pawn(color, new Square(0, 0)));
-				} else if (piecesW[i].substring(0, 1).equals("C")) {
-					takenBlack.add(new Castle(color, new Square(0, 0)));
-				}
-			}
-	    }
+	public BoardMatrix(ArrayList<ChessPiece> bor, ChessPiece kingB,
+			ChessPiece kingW, ArrayList<ChessPiece> takenB,
+			ArrayList<ChessPiece> takenW) {
+		super(bor, kingB, kingW, takenB, takenW);
 	}
 
 	// methods to play chess
 	public boolean isPlayableMove(Square startSqu, Square endSqu, int playerTurn) {
 		boolean playable = false;
-		ChessPiece mChessPiece = board.get(startSqu);
+		ChessPiece mChessPiece = getPieceAt(startSqu);
 		if (mChessPiece != null) {
 			// the player can only move their color.
 			if (playerTurn == 0 && mChessPiece.getColor() == 0
@@ -104,17 +41,20 @@ public class BoardMatrix implements Iterable<ChessPiece> {
 	}
 
 	public void makeMove(Square startSqu, Square endSqu) {
-		if (board.get(endSqu) != null) {
-			if (board.get(endSqu).getColor() == 0) {
-				takenWhite.add(board.get(endSqu));
-			} else {
-				takenBlack.add(board.get(endSqu));
+		if (!castleMove(this, startSqu, endSqu)) {
+			if (getPieceAt(endSqu) != null) {
+				if (getPieceAt(endSqu).getColor() == 0) {
+					addTakenWhite(getPieceAt(endSqu));
+				} else {
+					addTakenBlack(getPieceAt(endSqu));
+				}
 			}
+			setPieceAt(endSqu, getPieceAt(startSqu));
+			setPieceAt(startSqu, null);
+			getPieceAt(endSqu).setSquare(endSqu);
+			queenIfPawnReachesBack(this, endSqu);
+			getPieceAt(endSqu).setMoved();
 		}
-		board.set(endSqu, board.get(startSqu));
-		board.set(startSqu, null);
-		board.get(endSqu).setSquare(endSqu);
-		queenIfPawnReachesBack(this, endSqu);
 	}
 
 	// use to see if this move is a check move
@@ -126,19 +66,23 @@ public class BoardMatrix implements Iterable<ChessPiece> {
 		BoardMatrix copyBoardMat = this.deepCopySelf();
 		// make the desired move if not already made
 		if (!moveAlreadyMade) {
-			copyBoardMat.setPieceAt(endSqu, copyBoardMat.getPieceAt(startSqu));
-			copyBoardMat.setPieceAt(startSqu, null);
-			queenIfPawnReachesBack(copyBoardMat, new Square(endSqu.getRow(),
-					endSqu.getColumn()));
+			if (!castleMove(copyBoardMat, new Square(startSqu.getRow(),
+					startSqu.getColumn()),
+					new Square(endSqu.getRow(), endSqu.getColumn()))) {
+				copyBoardMat.setPieceAt(endSqu,
+						copyBoardMat.getPieceAt(startSqu));
+				copyBoardMat.setPieceAt(startSqu, null);
+				queenIfPawnReachesBack(copyBoardMat, new Square(
+						endSqu.getRow(), endSqu.getColumn()));
+			}
 		}
 		if (playerTurn == 0) {// white
-			kingPos = new Square(board.getKingWhiteReference().getSquare()
-					.getRow(), board.getKingWhiteReference().getSquare()
-					.getColumn());
+			kingPos = new Square(getKingWhiteReference().getSquare().getRow(),
+					getKingWhiteReference().getSquare().getColumn());
 			if (!moveAlreadyMade) {
 				// if desired move is to move the king must find where it was
 				// moved.
-				if (board.get(startSqu) instanceof King) {
+				if (getPieceAt(startSqu) instanceof King) {
 					kingPos.setRow(endSqu.getRow());
 					kingPos.setColumn(endSqu.getColumn());
 				}
@@ -166,13 +110,12 @@ public class BoardMatrix implements Iterable<ChessPiece> {
 			}
 		}
 		if (playerTurn == 1) {
-			kingPos = new Square(board.getKingBlackReference().getSquare()
-					.getRow(), board.getKingBlackReference().getSquare()
-					.getColumn());
+			kingPos = new Square(getKingBlackReference().getSquare().getRow(),
+					getKingBlackReference().getSquare().getColumn());
 			// if desired move is to move the king must find where it was
 			// moved.
 			if (!moveAlreadyMade) {
-				if (board.get(startSqu) instanceof King) {
+				if (getPieceAt(startSqu) instanceof King) {
 					kingPos.setRow(endSqu.getRow());
 					kingPos.setColumn(endSqu.getColumn());
 				}
@@ -210,9 +153,9 @@ public class BoardMatrix implements Iterable<ChessPiece> {
 			ArrayList<ChessPiece> whiteLeft = new ArrayList<ChessPiece>();
 			for (int i = 0; i < 8; i++) {
 				for (int j = 0; j < 8; j++) {
-					if (board.get(i, j) != null
-							&& board.get(i, j).getColor() == 0) {
-						whiteLeft.add(board.get(i, j));
+					if (getPieceAt(i, j) != null
+							&& getPieceAt(i, j).getColor() == 0) {
+						whiteLeft.add(getPieceAt(i, j));
 					}
 				}
 			}
@@ -245,9 +188,9 @@ public class BoardMatrix implements Iterable<ChessPiece> {
 			ArrayList<ChessPiece> blackLeft = new ArrayList<ChessPiece>();
 			for (int i = 0; i < 8; i++) {
 				for (int j = 0; j < 8; j++) {
-					if (board.get(i, j) != null
-							&& board.get(i, j).getColor() != 0) {
-						blackLeft.add(board.get(i, j));
+					if (getPieceAt(i, j) != null
+							&& getPieceAt(i, j).getColor() != 0) {
+						blackLeft.add(getPieceAt(i, j));
 					}
 				}
 			}
@@ -290,66 +233,121 @@ public class BoardMatrix implements Iterable<ChessPiece> {
 
 	}
 
-	public void restartGame() {
-		takenBlack = null;
-		takenWhite = null;
-		board.initialBoardSetup();
-	}
+	private boolean castleMove(BoardMatrix referenceBoard, Square startSqu,
+			Square endSqu) {
+		boolean castled = false;
+		if (referenceBoard.getPieceAt(startSqu) instanceof King) {
+			if (referenceBoard.getPieceAt(startSqu).getMoved() == false) {
+				if (referenceBoard.getPieceAt(startSqu).getColor() == 0) {
+					if (startSqu.getRow() == 7 && endSqu.getRow() == 7) {
+						if (endSqu.getColumn() == 2) {
+							if (referenceBoard.getPieceAt(7, 1) == null
+									&& referenceBoard.getPieceAt(7, 2) == null
+									&& referenceBoard.getPieceAt(7, 3) == null
+									&& referenceBoard.getPieceAt(7, 0) instanceof Castle
+									&& referenceBoard.getPieceAt(7, 0)
+											.getMoved() == false) {
+								referenceBoard.setPieceAt(7, 3,
+										referenceBoard.getPieceAt(7, 0));
+								referenceBoard.setPieceAt(7, 0, null);
+								referenceBoard.getPieceAt(7, 3).setSquare(7, 3);
+								referenceBoard.getPieceAt(7, 3).setMoved();
+								castled = true;
 
-	// methods to access pieces and variables
-	public ChessPiece getPieceAt(Square squ) {
-		return board.get(squ);
-	}
+							}
+						} else if (endSqu.getColumn() == 6) {
+							if (referenceBoard.getPieceAt(7, 5) == null
+									&& referenceBoard.getPieceAt(7, 6) == null
+									&& referenceBoard.getPieceAt(7, 7) instanceof Castle
+									&& referenceBoard.getPieceAt(7, 7)
+											.getMoved() == false) {
+								referenceBoard.setPieceAt(7, 5,
+										referenceBoard.getPieceAt(7, 7));
+								referenceBoard.setPieceAt(7, 7, null);
+								referenceBoard.getPieceAt(7, 5).setSquare(7, 5);
+								referenceBoard.getPieceAt(7, 5).setMoved();
+								castled = true;
 
-	public void setPieceAt(Square squ, ChessPiece piece) {
-		board.set(squ, piece);
-	}
+							}
+						}
+					}
+				} else {
+					if (startSqu.getRow() == 0 && endSqu.getRow() == 0) {
+						if (endSqu.getColumn() == 2) {
+							if (referenceBoard.getPieceAt(0, 1) == null
+									&& referenceBoard.getPieceAt(0, 2) == null
+									&& referenceBoard.getPieceAt(0, 3) == null
+									&& referenceBoard.getPieceAt(0, 0) instanceof Castle
+									&& referenceBoard.getPieceAt(0, 0)
+											.getMoved() == false) {
+								referenceBoard.setPieceAt(0, 3,
+										referenceBoard.getPieceAt(0, 0));
+								referenceBoard.setPieceAt(0, 0, null);
+								referenceBoard.getPieceAt(0, 3).setSquare(0, 3);
+								referenceBoard.getPieceAt(0, 3).setMoved();
+								castled = true;
 
-	public ArrayList<ChessPiece> getBlackTaken() {
-		return takenBlack;
-	}
+							}
+						} else if (endSqu.getColumn() == 6) {
+							if (referenceBoard.getPieceAt(0, 5) == null
+									&& referenceBoard.getPieceAt(0, 6) == null
+									&& referenceBoard.getPieceAt(0, 7) instanceof Castle
+									&& referenceBoard.getPieceAt(0, 7)
+											.getMoved() == false) {
+								referenceBoard.setPieceAt(0, 5,
+										referenceBoard.getPieceAt(0, 7));
+								referenceBoard.setPieceAt(0, 7, null);
+								referenceBoard.getPieceAt(0, 5).setSquare(0, 5);
+								referenceBoard.getPieceAt(0, 5).setMoved();
+								castled = true;
 
-	public ArrayList<ChessPiece> getWhiteTaken() {
-		return takenWhite;
-	}
-
-	public void removeLastBlackTaken() {
-		takenBlack.remove(takenBlack.size() - 1);
-	}
-
-	public void removeLastWhiteTaken() {
-		takenWhite.remove(takenWhite.size() - 1);
-	}
-
-	// iterate over pieces
-	public Iterator<ChessPiece> iterator() {
-		Iterator<ChessPiece> iprof = board.iterator();
-		return iprof;
+							}
+						}
+					}
+				}
+			}
+		}
+		if (castled) {
+			// move the king
+			referenceBoard.setPieceAt(endSqu,
+					referenceBoard.getPieceAt(startSqu));
+			referenceBoard.setPieceAt(startSqu, null);
+			referenceBoard.getPieceAt(endSqu).setSquare(endSqu);
+			referenceBoard.getPieceAt(endSqu).setMoved();
+		}
+		return castled;
 	}
 
 	// copy board
 	public BoardMatrix deepCopySelf() {
-		BoardMatrix copyMat;
-		if (takenWhite != null | takenBlack != null) {
-			if (takenWhite != null) {
-				if (takenBlack != null) {
-					copyMat = new BoardMatrix(board.deepCopy(), takenBlack,
-							takenWhite);
-				} else {
-					copyMat = new BoardMatrix(board.deepCopy(), null,
-							takenWhite);
+		ArrayList<ChessPiece> longBoardCopy = new ArrayList<ChessPiece>(64);
+		ChessPiece newKingReferenceBlack = null;
+		ChessPiece newKingReferenceWhite = null;
+		for (int i = 0; i < getLongBoard().size(); i++) {
+			if (getLongBoard().get(i) != null) {
+				longBoardCopy.add(getLongBoard().get(i).deepCopy());
+				if (getLongBoard().get(i) instanceof King) {
+					if (getLongBoard().get(i).getColor() == 1) {
+						newKingReferenceBlack = getLongBoard().get(i);
+					} else {
+						newKingReferenceWhite = getLongBoard().get(i);
+					}
 				}
 			} else {
-				copyMat = new BoardMatrix(board.deepCopy(), takenBlack, null);
+				longBoardCopy.add(null);
 			}
-		} else {
-			copyMat = new BoardMatrix(board.deepCopy(), null, null);
 		}
-		return copyMat;
-	}
+		ArrayList<ChessPiece> takenB = new ArrayList<ChessPiece>(16);
+		for (ChessPiece piece : getBlackTaken()) {
+			takenB.add(piece.deepCopy());
+		}
+		ArrayList<ChessPiece> takenW = new ArrayList<ChessPiece>(16);
+		for (ChessPiece piece : getWhiteTaken()) {
+			takenW.add(piece.deepCopy());
+		}
 
-	public String toString() {
-		return board.toString();
+		return new BoardMatrix(longBoardCopy, newKingReferenceBlack,
+				newKingReferenceWhite, takenB, takenW);
 	}
 
 }

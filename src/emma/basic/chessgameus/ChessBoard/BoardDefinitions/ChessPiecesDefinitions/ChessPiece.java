@@ -7,12 +7,14 @@ public abstract class ChessPiece {
 	int color;
 	Square square;
 	String pieceStr;
+	boolean moved;
 
 	public ChessPiece(int color, Square squ) {
 		this.color = color;
 		square = new Square();
 		square.setRow(squ.getRow());
 		square.setColumn(squ.getColumn());
+		moved = false;
 	}
 	
 	public ChessPiece(String str){
@@ -37,6 +39,13 @@ public abstract class ChessPiece {
 		square.setColumn(sq.getColumn());
 	}
 	
+	public boolean getMoved(){
+		return moved;
+	}
+	
+	public void setMoved(){
+		moved = true;
+	}
 	
 	
 	public abstract String toString();

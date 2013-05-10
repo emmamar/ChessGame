@@ -1,6 +1,8 @@
 package emma.basic.chessgameus;
 
 import emma.basic.chessgameus.OnlineMultiplayerMenu.MultiOnlineMenu;
+import emma.basic.chessgameus.infopages.About;
+import emma.basic.chessgameus.infopages.Rules;
 import emma.basic.chessgameus.ChessBoard.ChessPlayActivity;
 import android.app.Activity;
 import android.content.Intent;
@@ -51,6 +53,28 @@ public class ChessGameUSActivity extends Activity {
 				startActivity(i);
 			}
 		});
+		
+		
+		/** Choice to play multi-player online. */
+		Button rules = (Button) findViewById(R.id.rulesButton);
+		rules.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Intent i = new Intent(ChessGameUSActivity.this,
+						Rules.class);
+				startActivity(i);
+			}
+		});
+		
+		/** Choice to play multi-player online. */
+		Button about = (Button) findViewById(R.id.aboutButton);
+		about.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Intent i = new Intent(ChessGameUSActivity.this,
+						About.class);
+				startActivity(i);
+			}
+		});
+		
 	}
 
 	@Override

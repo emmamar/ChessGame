@@ -2,18 +2,27 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical" 
+    android:background="@drawable/chess_sideways">
 
     <Button
         android:id="@+id/createGame"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/MyCoolButton"
+        android:layout_width="145dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginLeft="10dp"
+        android:padding="3dp"
         android:text="@string/create_game" />
 
     <Button
         android:id="@+id/joinGame"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/MyCoolButton"
+        android:layout_width="145dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:padding="3dp"
         android:text="@string/join_current_game" />
 
 </LinearLayout>

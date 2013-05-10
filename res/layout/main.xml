@@ -2,24 +2,59 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="@drawable/menu_background"
+    android:dividerPadding="10dp"
     android:orientation="vertical" >
 
     <Button
         android:id="@+id/playComputer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/MyCoolButton"
+        android:layout_width="145dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="200dp"
+        android:layout_marginLeft="10dp"
+        android:padding="3dp"
         android:text="@string/play_computer" />
 
     <Button
         android:id="@+id/playMultiOnDevice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/MyCoolButton"
+        android:layout_width="145dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:padding="3dp"
         android:text="@string/play_multi_device" />
 
     <Button
         android:id="@+id/playMultiOnline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/MyCoolButton"
+        android:layout_width="145dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:padding="3dp"
         android:text="@string/play_muli_online" />
+
+    
+    <Button
+        android:id="@+id/rulesButton"
+        style="@style/MyCoolButton"
+        android:layout_width="145dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:padding="3dp"
+        android:text="Rules" />
+    
+     <Button
+        android:id="@+id/aboutButton"
+        style="@style/MyCoolButton"
+        android:layout_width="145dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:padding="3dp"
+        android:text="About"/>
 
 </LinearLayout>

@@ -183,4 +183,14 @@ public class JoinGame extends Activity {
 		super.onDestroy();
 		// The activity is about to be destroyed.
 	}
+	
 }
+
+
+
+
+
+
+
+
+

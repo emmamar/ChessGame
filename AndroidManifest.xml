@@ -9,31 +9,36 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name" >
+        android:icon="@drawable/chess_icon"
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
         <activity
-            android:label="@string/app_name"
-            android:name="emma.basic.chessgameus.ChessGameUSActivity" >
-            <intent-filter >
+            android:name="emma.basic.chessgameus.ChessGameUSActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
         <activity android:name="emma.basic.chessgameus.ChessBoard.ChessPlayActivity" >
         </activity>
-        
         <activity android:name="emma.basic.chessgameus.OnlineMultiplayerMenu.MultiOnlineMenu" >
         </activity>
-        
         <activity
             android:name="emma.basic.chessgameus.OnlineMultiplayerMenu.JoinGame"
             android:noHistory="true" >
         </activity>
-        
         <activity
             android:name="emma.basic.chessgameus.OnlineMultiplayerMenu.CreateGame"
+            android:noHistory="true" >
+        </activity>
+        <activity
+            android:name="emma.basic.chessgameus.infopages.Rules"
+            android:noHistory="true" >
+        </activity>
+        <activity
+            android:name="emma.basic.chessgameus.infopages.About"
             android:noHistory="true" >
         </activity>
     </application>

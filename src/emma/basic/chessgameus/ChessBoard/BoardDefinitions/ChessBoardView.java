@@ -11,7 +11,10 @@ import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.view.Display;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageView;
 
 // **********************************************************************
 // ChessBoardView extends view. It is used to display the chess board. It
@@ -52,20 +55,18 @@ public class ChessBoardView extends View {
 
 	// **********************************************************************
 	// Overridden ondraw method of the view class. This draws the chess board
-	// initially and on every call yp invalidate().**************************
+	// initially and on every call to invalidate().**************************
 	// **********************************************************************
 	@Override
 	public void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
+		int width = getMeasuredWidth();
 		for(ChessPiece piece: boardMatrix){
 		  if (piece != null) {
 		    Drawable drawableInThisPosition = getResources().getDrawable(piece.getResourceName());
 			Bitmap resizedBitmap = turnDrawableIntoResizedBitmap(drawableInThisPosition, false);
-			float objectToDrawHeight = (piece.getSquare().getColumn()) * 38;
-			float objectToDrawWidth = (piece.getSquare().getRow()) * 38;
-			float density = getResources().getDisplayMetrics().density;
-			objectToDrawHeight *= density;
-			objectToDrawWidth *= density;
+			float objectToDrawHeight = (piece.getSquare().getColumn()) * (width /8);
+			float objectToDrawWidth = (piece.getSquare().getRow()) * (width/8);
 			canvas.drawBitmap(resizedBitmap, objectToDrawHeight,
 					objectToDrawWidth, mPaint);
 		  }
@@ -83,11 +84,8 @@ public class ChessBoardView extends View {
 			}
 			Bitmap resizedBitmap = turnDrawableIntoResizedBitmap(
 					drawableSelector, true);
-			float objectToDrawHeight = (squareSelected.getColumn()) * 38;
-			float objectToDrawWidth = (squareSelected.getRow()) * 38;
-			float density = getResources().getDisplayMetrics().density;
-			objectToDrawHeight *= density;
-			objectToDrawWidth *= density;
+			float objectToDrawHeight = (squareSelected.getColumn()) * (width/8);
+			float objectToDrawWidth = (squareSelected.getRow()) * (width/8);
 			canvas.drawBitmap(resizedBitmap, objectToDrawHeight,
 					objectToDrawWidth, mPaint);
 		}
@@ -100,21 +98,18 @@ public class ChessBoardView extends View {
 	// Returns a bitmap of the resized image.
 	private Bitmap turnDrawableIntoResizedBitmap(Drawable drawableSelector,
 			boolean selector) {
-		int newWidth = 35;
-		int newHeight = 35;
+		int screenwidth = getMeasuredWidth();
+		int newWidth = (screenwidth/8);
+		int newHeight = (screenwidth/8);
 		if (selector) {
-			newWidth = 38;
-			newHeight = 38;
+			newWidth = (screenwidth/8);
+			newHeight = (screenwidth/8);
 		}
 		Bitmap bitmapSelector = ((BitmapDrawable) drawableSelector).getBitmap();
 		int width = bitmapSelector.getWidth();
 		int height = bitmapSelector.getHeight();
 		float scaleWidth = ((float) newWidth) / width;
 		float scaleHeight = ((float) newHeight) / height;
-		
-		float density = getResources().getDisplayMetrics().density;
-		scaleWidth *= density;
-		scaleHeight *= density;
 		
 		Matrix matrix = new Matrix();
 		matrix.postScale(scaleWidth, scaleHeight);

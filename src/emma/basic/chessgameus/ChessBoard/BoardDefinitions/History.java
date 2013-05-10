@@ -19,6 +19,11 @@ public class History {
 	public void deleteLastHistory() {
 		history.remove(history.size() - 1);
 	}
+	
+	public void clear() {
+		history = new ArrayList<BoardMatrix>();
+		
+	}
 
 	public ArrayList<BoardMatrix> getHistory() {
 		return history;
@@ -33,10 +38,26 @@ public class History {
 		return history.size();
 	}
 	
-	public String[] toStringArray(){
+	public String[] toStringArrayBoards(){
 		String[] str = new String[history.size()];
 		for(int i = 0; i < str.length; i++){
 		    str[i] = history.get(i).toString();
+		}
+		return str;
+	}
+	
+	public String[] toStringArrayTakenWhite(){
+		String[] str = new String[history.size()];
+		for(int i = 0; i < str.length; i++){
+		    str[i] = history.get(i).toStringTakenW();
+		}
+		return str;
+	}
+	
+	public String[] toStringArrayTakenBlack(){
+		String[] str = new String[history.size()];
+		for(int i = 0; i < str.length; i++){
+		    str[i] = history.get(i).toStringTakenB();
 		}
 		return str;
 	}

@@ -2,6 +2,9 @@ package emma.basic.chessgameus.ChessBoard.BoardDefinitions;
 
 import java.util.Arrays;
 
+import android.view.Display;
+import emma.basic.chessgameus.R;
+
 public class Square{
 	int row;
 	int column;
@@ -20,9 +23,9 @@ public class Square{
 	}
 	
 	//given a numeric notation for a square
-	public Square(int X, int Y, float density) {
-		this.row = getColumnRow(X, density);
-		this.column = getColumnRow(Y, density);
+	public Square(int X, int Y, float w) {
+		this.row = getColumnRow(X, (int)w);
+		this.column = getColumnRow(Y, (int)w);
 	}
 	
 	//given an algebraic notation for a square
@@ -59,12 +62,11 @@ public class Square{
 		return squ;
 	}
 
-	private int getColumnRow(int YX, float density) {
-		int[] graphicsNumbers = {38, 76, 114, 152, 190, 228, 266};
-		for(int i = 0; i < graphicsNumbers.length; i++){
-		  graphicsNumbers[i] *= density;
-		}
+	private int getColumnRow(int YX, int w){
+		int width = w/8;
 		
+		int[] graphicsNumbers = {width, width*2, width*3, width*4, width*5, width*6, width*7};
+
 		if (YX <= graphicsNumbers[3]) {
 			if (YX <= graphicsNumbers[1]) {
 				if (YX <= graphicsNumbers[0]) {

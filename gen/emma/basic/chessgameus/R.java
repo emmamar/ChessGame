@@ -10,62 +10,105 @@ package emma.basic.chessgameus;
 public final class R {
     public static final class attr {
     }
+    public static final class color {
+        public static final int background=0x7f040002;
+        public static final int black=0x7f040009;
+        public static final int bluedark=0x7f040004;
+        public static final int bluelight=0x7f040003;
+        public static final int greendark=0x7f040006;
+        public static final int greenlight=0x7f040005;
+        public static final int grey=0x7f040001;
+        public static final int orangedark=0x7f040008;
+        public static final int orangelight=0x7f040007;
+        public static final int white=0x7f040000;
+    }
+    public static final class dimen {
+        /**  Default screen margins, per the Android Design guidelines. 
+
+         Customize dimensions originally defined in res/values/dimens.xml (such as
+         screen margins) for sw720dp devices (e.g. 10" tablets) in landscape here.
+    
+         */
+        public static final int activity_horizontal_margin=0x7f050000;
+        public static final int activity_vertical_margin=0x7f050001;
+    }
     public static final class drawable {
         public static final int bishop_black=0x7f020000;
         public static final int bishop_white=0x7f020001;
-        public static final int castle_black=0x7f020002;
-        public static final int castle_white=0x7f020003;
-        public static final int chess_board=0x7f020004;
-        public static final int ic_launcher=0x7f020005;
-        public static final int king_black=0x7f020006;
-        public static final int king_white=0x7f020007;
-        public static final int knight_black=0x7f020008;
-        public static final int knight_white=0x7f020009;
-        public static final int pawn_black=0x7f02000a;
-        public static final int pawn_white=0x7f02000b;
-        public static final int queen_black=0x7f02000c;
-        public static final int queen_white=0x7f02000d;
-        public static final int square_click=0x7f02000e;
-        public static final int square_move=0x7f02000f;
+        public static final int button_background=0x7f020002;
+        public static final int castle_black=0x7f020003;
+        public static final int castle_white=0x7f020004;
+        public static final int chess_board=0x7f020005;
+        public static final int chess_icon=0x7f020006;
+        public static final int chess_sideways=0x7f020007;
+        public static final int ic_launcher=0x7f020008;
+        public static final int king_black=0x7f020009;
+        public static final int king_white=0x7f02000a;
+        public static final int knight_black=0x7f02000b;
+        public static final int knight_white=0x7f02000c;
+        public static final int menu_background=0x7f02000d;
+        public static final int my_button=0x7f02000e;
+        public static final int pawn_black=0x7f02000f;
+        public static final int pawn_white=0x7f020010;
+        public static final int queen_black=0x7f020011;
+        public static final int queen_white=0x7f020012;
+        public static final int square_click=0x7f020013;
+        public static final int square_move=0x7f020014;
     }
     public static final class id {
-        public static final int availableGamesList=0x7f05000b;
-        public static final int availableGamesText=0x7f05000a;
-        public static final int blackPiecesTakenGrid=0x7f050001;
-        public static final int chessBoardView=0x7f050002;
-        public static final int createGame=0x7f050009;
-        public static final int enterGameNameEdit=0x7f050008;
-        public static final int enterGameNameText=0x7f050007;
-        public static final int joinGame=0x7f05000f;
-        public static final int playComputer=0x7f05000c;
-        public static final int playMultiOnDevice=0x7f05000d;
-        public static final int playMultiOnline=0x7f05000e;
-        public static final int playerTurnText=0x7f050000;
-        public static final int resignGame=0x7f050006;
-        public static final int restartGame=0x7f050005;
-        public static final int undoMove=0x7f050004;
-        public static final int whitePiecesTakenGrid=0x7f050003;
+        public static final int aboutButton=0x7f090010;
+        public static final int action_settings=0x7f090012;
+        public static final int availableGamesList=0x7f09000b;
+        public static final int availableGamesText=0x7f09000a;
+        public static final int blackPiecesTakenGrid=0x7f090001;
+        public static final int chessBoardView=0x7f090002;
+        public static final int createGame=0x7f090009;
+        public static final int enterGameNameEdit=0x7f090008;
+        public static final int enterGameNameText=0x7f090007;
+        public static final int joinGame=0x7f090011;
+        public static final int playComputer=0x7f09000c;
+        public static final int playMultiOnDevice=0x7f09000d;
+        public static final int playMultiOnline=0x7f09000e;
+        public static final int playerTurnText=0x7f090000;
+        public static final int resignGame=0x7f090006;
+        public static final int restartGame=0x7f090005;
+        public static final int rulesButton=0x7f09000f;
+        public static final int undoMove=0x7f090004;
+        public static final int whitePiecesTakenGrid=0x7f090003;
     }
     public static final class layout {
-        public static final int chess_play=0x7f030000;
-        public static final int create_game=0x7f030001;
-        public static final int join_game=0x7f030002;
-        public static final int list_item=0x7f030003;
-        public static final int main=0x7f030004;
-        public static final int multi_online_menu=0x7f030005;
+        public static final int activity_about=0x7f030000;
+        public static final int activity_rules=0x7f030001;
+        public static final int chess_play=0x7f030002;
+        public static final int create_game=0x7f030003;
+        public static final int join_game=0x7f030004;
+        public static final int list_item=0x7f030005;
+        public static final int main=0x7f030006;
+        public static final int multi_online_menu=0x7f030007;
+    }
+    public static final class menu {
+        public static final int about=0x7f080000;
+        public static final int rules=0x7f080001;
     }
     public static final class string {
-        public static final int UndoString=0x7f040003;
-        public static final int app_name=0x7f040001;
-        public static final int available_games=0x7f040008;
-        public static final int create_game=0x7f040006;
-        public static final int enter_game_name=0x7f040009;
-        public static final int hello=0x7f040000;
-        public static final int join_current_game=0x7f040007;
-        public static final int play_computer=0x7f04000b;
-        public static final int play_muli_online=0x7f040005;
-        public static final int play_multi_device=0x7f040002;
-        public static final int resign_game=0x7f04000a;
-        public static final int restartgamestring=0x7f040004;
+        public static final int UndoString=0x7f060003;
+        public static final int action_settings=0x7f06000d;
+        public static final int app_name=0x7f060001;
+        public static final int available_games=0x7f060008;
+        public static final int create_game=0x7f060006;
+        public static final int enter_game_name=0x7f060009;
+        public static final int hello=0x7f060000;
+        public static final int hello_world=0x7f06000e;
+        public static final int join_current_game=0x7f060007;
+        public static final int play_computer=0x7f06000b;
+        public static final int play_muli_online=0x7f060005;
+        public static final int play_multi_device=0x7f060002;
+        public static final int resign_game=0x7f06000a;
+        public static final int restartgamestring=0x7f060004;
+        public static final int title_activity_about=0x7f06000f;
+        public static final int title_activity_rules=0x7f06000c;
+    }
+    public static final class style {
+        public static final int MyCoolButton=0x7f070000;
     }
 }
